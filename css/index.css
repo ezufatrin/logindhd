@@ -1,0 +1,86 @@
+body{font-size: 16px}
+
+
+
+.rounded-circle {
+
+  float:left;
+
+  margin-right:10px;
+
+}
+
+
+
+.rounded {float:right;}
+
+
+
+.media {
+
+  border-top: 1px;
+
+  border-bottom: 1px;
+
+  border-left: 0px;
+
+  border-right: 0px;
+
+  border-color: #999999;
+
+  margin-bottom: 10px;
+
+  padding-top: 5px;
+
+  padding-bottom: 14px;
+
+  -webkit-box-shadow: 0px 2px 5px 0px rgba(153,153,153,1);
+
+  -moz-box-shadow: 0px 2px 5px 0px rgba(153,153,153,1);
+
+  box-shadow: 0px 2px 5px 0px rgba(153,153,153,1);
+
+}
+
+
+
+.card {
+
+  border-top: 1px;
+
+  border-bottom: 1px;
+
+  border-left: 0px;
+
+  border-right: 0px;
+
+  border-color: #999999;
+
+  margin-bottom: 10px;
+
+  padding-top: 5px;
+
+  padding-bottom: 14px;
+
+  -webkit-box-shadow: 0px 2px 15px 0px rgba(153,153,153,1);
+
+  -moz-box-shadow: 0px 2px 15px 0px rgba(153,153,153,1);
+
+  box-shadow: 0px 2px 15px 0px rgba(153,153,153,1);
+
+}
+
+
+
+.card-footer{background-color: inherit;}
+
+
+
+.mr-3 {margin-top:5px;
+
+       margin-left: 10px;}
+
+
+
+.container-fluid{margin:0; padding:0;}
+
