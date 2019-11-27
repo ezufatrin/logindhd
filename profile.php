@@ -99,10 +99,7 @@ if(isset($_POST['submitKolam']))
 
 if(isset($_POST['submit']))
   {
-
-
 	$file = $_FILES['image']['name'];
-
 	
 	$file_loc = $_FILES['image']['tmp_name'];
 	$tipe_file = $_FILES['image']['type'];
@@ -112,11 +109,10 @@ if(isset($_POST['submit']))
 	$new_file_name = $namaGambar.".".$extension;
 	$final_file=str_replace(' ','-',$new_file_name);
 
-
 	// Ambil Data yang Dikirim dari Form
-$nama_file = $_FILES['gambar']['name'];
-$ukuran_file = $_FILES['gambar']['size'];
-$tmp_file = $_FILES['gambar']['tmp_name'];
+	$nama_file = $_FILES['gambar']['name'];
+	$ukuran_file = $_FILES['gambar']['size'];
+	$tmp_file = $_FILES['gambar']['tmp_name'];
 
 	if($file)
 	{
@@ -685,10 +681,27 @@ $tmp_file = $_FILES['gambar']['tmp_name'];
 		$(function() {
 			$("#mobile").mask("0899-9999-99999",{autoclear:false});
 			$("#ktp").mask("9999-9999-9999-9999",{autoclear:false});
-// 			$("#ktp").mask("9999-9999-9999-9999",{autoclear:false, completed:function(){alert("maksimal 16 angka!");}});
-
 		});
 	</script>
+	
+<div class="footer bg-warning pt-1  pl-1 pr-1">
+  <p>Aplikasi ini Masih Dalam Tahapan Pengembangan<br>Masih masa uji coba</p>
+</div>
+
 </body>
 </html>
 <?php } ?>
+
+
+<style>
+.footer {
+font-size: 16px;
+font-weight: bold;
+   position: fixed;
+   left: 0;
+   height : 60px;
+   bottom: 0;
+   width: 100%;  
+   text-align: center;   
+}
+</style>
