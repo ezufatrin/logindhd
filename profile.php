@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 error_reporting(0);
 include('includes/config.php');
@@ -21,8 +22,6 @@ if(isset($_POST['submitKolam']))
 	$result=$query->fetch(PDO::FETCH_OBJ);
 	$cnt=1;
 	$idedit = $result->id;
-
-
 
 	$sql = "SELECT COUNT(id) FROM kolam WHERE status='Aktif' AND id_pemilik = ".$idedit." AND jenis = 'Plasma'";
 	$hasil = mysqli_query($db, $sql);
@@ -93,49 +92,91 @@ if(isset($_POST['submitKolam']))
 			mysqli_query($db, $sql);
 		}
 	}
-
-
 }
+
 
 if(isset($_POST['submit']))
   {
-	$file = $_FILES['image']['name'];
-	
-	$file_loc = $_FILES['image']['tmp_name'];
+	$email = $_SESSION['alogin'];
+	$sql = "SELECT * from users where email = (:email);";
+	$query = $dbh -> prepare($sql);
+	$query-> bindParam(':email', $email, PDO::PARAM_STR);
+	$query->execute();
+	$result=$query->fetch(PDO::FETCH_OBJ);
+	$cnt=1;
+	$idedit = $result->id;
+
+	$file = $_FILES['image']['name'];	
 	$tipe_file = $_FILES['image']['type'];
-	$folder="images/";
-	$extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-	$namaGambar = rand();
-	$new_file_name = $namaGambar.".".$extension;
-	$final_file=str_replace(' ','-',$new_file_name);
-
-	// Ambil Data yang Dikirim dari Form
-	$nama_file = $_FILES['gambar']['name'];
-	$ukuran_file = $_FILES['gambar']['size'];
-	$tmp_file = $_FILES['gambar']['tmp_name'];
-
+	$filesize = $_FILES['image']['size'];
+	// var_dump();
+	// die();
+	$folder="images/";	
+	$tmp_file = $_FILES['image']['tmp_name'];	
+	
 	if($file)
 	{
+		unlink($folder.$result->image);	
 		if($tipe_file == "image/jpeg" || $tipe_file == "image/png")
-		{
+		{				
 			
-			$image=$_POST['image'];
-			if(move_uploaded_file($file_loc,$folder.$final_file))
-			{
-				$image=$final_file;
+			$width_size = 300;
+     
+			// tentukan di mana image akan ditempatkan setelah diupload
+			$filesave = $folder . $file;
+			move_uploaded_file($_FILES['image']['tmp_name'], $filesave);
+			 
+			// menentukan nama image setelah dibuat
+			$namabaru = uniqid(rand()) .".jpg";
+			$resize_image = $folder.$namabaru ;
+			 
+			// mendapatkan ukuran width dan height dari image
+			list( $width, $height ) = getimagesize($filesave);
+			 
+			// mendapatkan nilai pembagi supaya ukuran skala image yang dihasilkan sesuai dengan aslinya
+			$k = $width / $width_size;
+			 
+			// menentukan width yang baru
+			$newwidth = $width / $k;
+			 
+			// menentukan height yang baru
+			$newheight = $height / $k;
+			 
+			// fungsi untuk membuat image yang baru
+			$thumb = imagecreatetruecolor($newwidth, $newheight);
+			if($tipe_file == "image/jpeg"){
+				$source = imagecreatefromjpeg($filesave);
+			}else if($tipe_file == "image/png"){
+				$source = imagecreatefrompng($filesave);
 			}
+			
+			
+			// men-resize image yang baru
+			if(imagecopyresized($thumb, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height))
+			{
+				// // menyimpan image yang baru
+				// imagejpeg($thumb, $resize_image);
+
+				if($tipe_file == "image/jpeg"){
+					imagejpeg($thumb, $resize_image);
+				}else if($tipe_file == "image/png"){
+					imagepng($thumb, $resize_image);
+				}
+							
+				imagedestroy($thumb);
+				imagedestroy($source);
+				unlink($filesave);
+			} else {
+				die("file terlalu besar");
+			}
+			
+			
+			
 		} else {
 			$message = "Hanya file Gambar yang diizinkan (jpeg/png)";
 			echo "<script>alert('$message');</script>";
 		}
 	}	
-	
-	
-	
-	 if($ukuran_file <= 1000000){ 	}
-
-
-
 
 	$name=$_POST['name'];
 	$cabang=$_POST['cabang'];
@@ -154,7 +195,7 @@ if(isset($_POST['submit']))
 	$referensi = $_POST['referensi'];
 
 
-	$sql="UPDATE users SET name=(:name), email=(:email), cabang=(:cabang), ktp=(:ktp),alamat=(:alamat),kota=(:kota),kecamatan=(:kecamatan),kelurahan=(:kelurahan),ban=(:ban),norek=(:norek),anrek=(:anrek),mobile=(:mobileno), designation=(:designation), referensi=(:referensi), Image=(:image) WHERE id=(:idedit)";
+	$sql="UPDATE users SET name=(:name), email=(:email), cabang=(:cabang), ktp=(:ktp),alamat=(:alamat),kota=(:kota),kecamatan=(:kecamatan),kelurahan=(:kelurahan),ban=(:ban),norek=(:norek),anrek=(:anrek),mobile=(:mobileno), designation=(:designation), referensi=(:referensi), image=(:namabaru) WHERE id=(:idedit)";
 	$query = $dbh->prepare($sql);
 	$query-> bindParam(':name', $name, PDO::PARAM_STR);
 	$query-> bindParam(':cabang', $cabang, PDO::PARAM_STR);
@@ -169,7 +210,7 @@ if(isset($_POST['submit']))
 	$query-> bindParam(':email', $email, PDO::PARAM_STR);
 	$query-> bindParam(':mobileno', $mobileno, PDO::PARAM_STR);
 	$query-> bindParam(':designation', $designation, PDO::PARAM_STR);
-	$query-> bindParam(':image', $image, PDO::PARAM_STR);
+	$query-> bindParam(':namabaru', $namabaru, PDO::PARAM_STR);
 	$query-> bindParam(':idedit', $idedit, PDO::PARAM_STR);
 	$query-> bindParam(':referensi', $referensi, PDO::PARAM_STR);
 	$query->execute();
