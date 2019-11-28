@@ -96,7 +96,7 @@ if(isset($_POST['submitKolam']))
 
 
 if(isset($_POST['submit']))
-  {
+  { 
 	$email = $_SESSION['alogin'];
 	$sql = "SELECT * from users where email = (:email);";
 	$query = $dbh -> prepare($sql);
@@ -109,18 +109,16 @@ if(isset($_POST['submit']))
 	$file = $_FILES['image']['name'];	
 	$tipe_file = $_FILES['image']['type'];
 	$filesize = $_FILES['image']['size'];
-	// var_dump();
-	// die();
 	$folder="images/";	
 	$tmp_file = $_FILES['image']['tmp_name'];	
-	
+
 	if($file)
-	{
-		unlink($folder.$result->image);	
+	{		
+		
 		if($tipe_file == "image/jpeg" || $tipe_file == "image/png")
 		{				
 			
-			$width_size = 300;
+			$width_size = 400;
      
 			// tentukan di mana image akan ditempatkan setelah diupload
 			$filesave = $folder . $file;
@@ -149,34 +147,27 @@ if(isset($_POST['submit']))
 			}else if($tipe_file == "image/png"){
 				$source = imagecreatefrompng($filesave);
 			}
-			
-			
-			// men-resize image yang baru
 			if(imagecopyresized($thumb, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height))
-			{
-				// // menyimpan image yang baru
-				// imagejpeg($thumb, $resize_image);
-
+			{		
 				if($tipe_file == "image/jpeg"){
 					imagejpeg($thumb, $resize_image);
 				}else if($tipe_file == "image/png"){
 					imagepng($thumb, $resize_image);
-				}
-							
+				}							
 				imagedestroy($thumb);
-				imagedestroy($source);
-				unlink($filesave);
+				imagedestroy($source);				
+				unlink($folder.$result->image);	//menghapus foto user lama
+				unlink($filesave); //menghapus foto asli yg baru
 			} else {
 				die("file terlalu besar");
-			}
-			
-			
-			
+			}	
 		} else {
 			$message = "Hanya file Gambar yang diizinkan (jpeg/png)";
 			echo "<script>alert('$message');</script>";
 		}
-	}	
+	} else {
+		$namabaru=$result->image; //nama file baru adalah nama file lama, karena tidak ada foto yg diupload
+	} 
 
 	$name=$_POST['name'];
 	$cabang=$_POST['cabang'];
@@ -471,7 +462,7 @@ if(isset($_POST['submit']))
                 </ul>
               </div><!-- /.card-header -->
               <div class="card-body">
-                <div class="tab-content">
+                <div class="tab-content mb-5">
 					<!-- /.tab-pane -->
 					<div class="active tab-pane" id="dashboard">
 						<div class="container-fluid">
