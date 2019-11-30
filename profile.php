@@ -3,16 +3,12 @@
 session_start();
 error_reporting(0);
 include('includes/config.php');
+include('proses.php');
 if(strlen($_SESSION['alogin'])==0)
 	{
 header('location:index.php');
 }
 else{
-
-if(isset($_POST['submitKolam']))
-{
-	$inputanKolamPlasma = $_POST['kolamplasma'];
-	$inputanKolamMandiri = $_POST['kolammandiri'];
 
 	$email = $_SESSION['alogin'];
 	$sql = "SELECT * from users where email = (:email);";
@@ -32,7 +28,7 @@ if(isset($_POST['submitKolam']))
 		{
 		   $jumlahKolamPlasma = $row['COUNT(id)'];
 		}
-	 }
+	}
 	$sql = "SELECT COUNT(id) FROM kolam WHERE status='Aktif' AND id_pemilik = ".$idedit." AND jenis = 'Mandiri'";
 	$hasil = mysqli_query($db, $sql);
 
@@ -43,6 +39,12 @@ if(isset($_POST['submitKolam']))
 		   $jumlahKolamMandiri = $row['COUNT(id)'];
 		}
 	}
+
+if(isset($_POST['submitKolam']))
+{
+	$inputanKolamPlasma = $_POST['kolamplasma'];
+	$inputanKolamMandiri = $_POST['kolammandiri'];
+	
 
 	$sql = "SELECT * from kolam WHERE id_pemilik= ".$idedit;
 	$ada = mysqli_query($db, $sql);
@@ -105,29 +107,28 @@ if(isset($_POST['submit']))
 	$result=$query->fetch(PDO::FETCH_OBJ);
 	$cnt=1;
 	$idedit = $result->id;
-
 	$file = $_FILES['image']['name'];	
 	$tipe_file = $_FILES['image']['type'];
 	$filesize = $_FILES['image']['size'];
 	$folder="images/";	
-	$tmp_file = $_FILES['image']['tmp_name'];	
+	$tmp_file = $_FILES['image']['tmp_name'];		
 
 	if($file)
 	{		
 		
 		if($tipe_file == "image/jpeg" || $tipe_file == "image/png")
 		{				
-			
-			$width_size = 400;
-     
+			//size image yang diinginkan
+			$width_size = 400;     
+
 			// tentukan di mana image akan ditempatkan setelah diupload
 			$filesave = $folder . $file;
 			move_uploaded_file($_FILES['image']['tmp_name'], $filesave);
-			 
+
 			// menentukan nama image setelah dibuat
 			$namabaru = uniqid(rand()) .".jpg";
-			$resize_image = $folder.$namabaru ;
-			 
+			$resize_image = $folder.$namabaru ;	
+
 			// mendapatkan ukuran width dan height dari image
 			list( $width, $height ) = getimagesize($filesave);
 			 
@@ -203,10 +204,102 @@ if(isset($_POST['submit']))
 	$query-> bindParam(':designation', $designation, PDO::PARAM_STR);
 	$query-> bindParam(':namabaru', $namabaru, PDO::PARAM_STR);
 	$query-> bindParam(':idedit', $idedit, PDO::PARAM_STR);
-	$query-> bindParam(':referensi', $referensi, PDO::PARAM_STR);
-	$query->execute();
+	$query-> bindParam(':referensi', $referensi, PDO::PARAM_STR);	
 	$msg="Information Updated Successfully";
+	if($query->execute()){
+		$pesan = 1;
+	} else {$pesan = 2;}
+	
 }
+
+if(isset($_POST['monitorharian']))
+{	
+	$monitorPHAir = $_POST['phair'];
+	$monitorSuhuAir = $_POST['suhuair'];
+	$monitorKematian = $_POST['kematian'];
+	$monitorBeratPakan = $_POST['beratpakan'];
+	$monitorKondisiAir = $_POST['kondisiair'];
+	$monitorKondisiIkan = $_POST['kondisiikan'];
+	$monitorTanggal = $_POST['tanggalpengukuran'];
+	$monitorIdKolam = $_POST['idkolam1'];
+
+	$sql = "INSERT INTO monitor (suhu_air, ph_air, kematian, berat_pakan, kondisi_air, kondisi_ikan, tanggal, id_kolam) VALUES("
+	.$monitorSuhuAir.",".$monitorPHAir.",".$monitorKematian.",".$monitorBeratPakan.",'".$monitorKondisiAir."','".$monitorKondisiIkan."','".$monitorTanggal."',".$monitorIdKolam.")";
+	// die($sql);
+	if(mysqli_query($db, $sql)){
+		$pesan = 1;
+	} else {$pesan = 2;}
+
+	
+}
+
+if(isset($_POST['pasangkolam']))
+{		
+
+	$tanggalPasang = $_POST['tanggalpemasangan'];
+	$IdKolam = $_POST['idkolam'];
+	// echo ($tanggalPasang);
+	// echo ($IdKolam);
+
+	$sql = "UPDATE kolam SET tanggal_pasang='".$tanggalPasang."' WHERE id=".$IdKolam;	
+	if(mysqli_query($db, $sql)){
+		$pesan = 1;
+	} else {$pesan = 2;}	
+}
+
+if(isset($_POST['bibitmasuk']))
+{		
+	$populasiBibit = $_POST['populasibibit'];
+	$ukuranBibit = $_POST ['ukuranbibit'];
+	$beratTotalBibit = $_POST['beratbibit'];
+	$tanggalBibitMasuk = $_POST['tanggalmasuk'];
+	$IdKolam = $_POST['idkolam'];
+
+	$sql = "INSERT INTO bibit (berat, ukuran, populasi, tanggal_masuk, id_kolam) VALUES("
+	.$beratTotalBibit.",".$ukuranBibit.",".$populasiBibit.",'".$tanggalBibitMasuk."',".$IdKolam.")";
+	 if(mysqli_query($db, $sql)){
+		 $$pesan = 1;
+	 } else {$pesan = 2;}
+
+	
+}
+
+if(isset($_POST['pakanmasuk']))
+{	
+	$beratPakan = $_POST['beratpakan'];
+	$jenisPakan = $_POST['jenispakan'];
+	$tanggalPakanMasuk = $_POST['tanggalmasuk'];
+	$IdKolam = $_POST['idkolam'];
+
+	$sql = "INSERT INTO pakan (jenis, berat, tanggal_masuk, id_kolam) VALUES("
+	.$jenisPakan.",".$beratPakan.",'".$tanggalPakanMasuk."',".$IdKolam.")";
+	// die($sql);
+	if(mysqli_query($db, $sql)){
+		$pesan = 1;
+	} else {$pesan = 2;}
+
+	
+}
+
+if(isset($_POST['panen']))
+{	
+
+	$beratPanen = $_POST['berattotal'];
+	$jumlahIkanPanen = $_POST['populasi'];
+	$tanggalPanen = $_POST['tanggalpanen'];
+	$IdKolam = $_POST['idkolam'];
+
+	$sql = "INSERT INTO panen (berat, populasi, tanggal_panen, id_kolam) VALUES("
+	.$beratPanen.",".$jumlahIkanPanen.",'".$tanggalPanen."',".$IdKolam.")";
+	// die($sql);
+	if(mysqli_query($db, $sql)){
+		$pesan = 1;
+	} else {$pesan = 2;}
+	
+}
+
+
+
 ?>
 
 <!doctype html>
@@ -305,7 +398,21 @@ if(isset($_POST['submit']))
 
 
 }
+
 		</style>
+
+		<script>
+			$("form input[type=text]").on("change invalid", function() {
+				var textfield = $(this).get(0);
+				
+				// hapus dulu pesan yang sudah ada
+				textfield.setCustomValidity("");
+				
+				if (!textfield.validity.valid) {
+				textfield.setCustomValidity("Tidak boleh kosong!");  
+				}
+			});
+			</script>
 </head>
 
 <body>
@@ -320,30 +427,41 @@ if(isset($_POST['submit']))
 	$result=$query->fetch(PDO::FETCH_OBJ);
 	$cnt=1;
 	$idedit = $result->id;
-
-	$sql = "SELECT COUNT(id) FROM kolam WHERE status='Aktif' AND id_pemilik = ".$idedit." AND jenis = 'Plasma'";
+	
+	//data kolam plasma
+	$sql = "SELECT id FROM kolam WHERE status='Aktif' AND id_pemilik = ".$idedit." AND jenis = 'Plasma'";
 	$hasil = mysqli_query($db, $sql);
-
-	if (mysqli_num_rows($hasil) > 0)
-	{
+	if (mysqli_num_rows($hasil) > 0){			
+		$s=0;
 		while($row = mysqli_fetch_assoc($hasil))
 		{
-		   $jumlahKolamPlasma = $row['COUNT(id)'];
+			$idKolamPlasma[$s] =  $row['id'];
+			$s++;			
 		}
-	 } 
-
-	$sql = "SELECT COUNT(id) FROM kolam WHERE status='Aktif' AND id_pemilik = ".$idedit." AND jenis = 'Mandiri'";
+	}
+	
+	//data kolam mandiri
+	$sql = "SELECT id FROM kolam WHERE status='Aktif' AND id_pemilik = ".$idedit." AND jenis = 'Mandiri'";
 	$hasil = mysqli_query($db, $sql);
-
 	if (mysqli_num_rows($hasil) > 0)
 	{
+		$s=0;
 		while($row = mysqli_fetch_assoc($hasil))
 		{
-		   $jumlahKolamMandiri = $row['COUNT(id)'];
+			$idKolamMandiri[$s] =  $row['id'];
+			// Fill an array with count() number of elements with value 'id_state=?'
+			// $kalimat = array_fill(0, 1, '');
+			$kalimat = implode(" OR id_kolam= ",$idKolamMandiri);
+			
+			$s++;			
 		}
-	 } 
+	}
 
-	 ?>
+	$arrayIdKolamPlasma = $idKolamPlasma;
+	$arrayIdKolamMandiri = $idKolamMandiri;
+
+
+?>
 
 
  <!-- Content Wrapper. Contains page content -->
@@ -354,13 +472,15 @@ if(isset($_POST['submit']))
         <div class="row mb-2">
           <div class="col-sm-6">
             <h1>Profile Mitra</h1>
-          </div>
+          </div>		  
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="index.php">Home</a></li>
               <li class="breadcrumb-item active">User Profile</li>
             </ol>
+			
           </div>
+		  
         </div>
       </div><!-- /.container-fluid -->
     </section>
@@ -372,7 +492,7 @@ if(isset($_POST['submit']))
           <div class="col-md-3">
 
             <!-- Profile Image -->
-            <div class="card card-info card-outline">
+            <div class="card card-info card-outline" >
               <div class="card-body box-profile">
                 <div class="text-center">
                   <img class="profile-user-img img-fluid img-circle"
@@ -399,13 +519,16 @@ if(isset($_POST['submit']))
 				<div class="collapse" id="collapseExample">
 					<div class="card card-body">
 						<form method="POST">
-							<label for="">Jumlah Kolam Plasma</label>
-							<input type="number" name="kolamplasma">
+						<div class="text-center"> 
+								<label class="mt-2">Jumlah Kolam Plasma</label>
+								<input type="number" name="kolamplasma" class="form-control" min="1" max="100" oninvalid="this.setCustomValidity('Tidak Boleh lebih dari 100')">
 
-							<label for="">Jumlah Kolam Mandiri</label>
-							<input type="number" name="kolammandiri">
+								<label class="mt-2">Jumlah Kolam Mandiri</label>
+								<input type="number" name="kolammandiri" class="form-control" min="1" max="100" oninvalid="this.setCustomValidity('Tidak Boleh lebih dari 100')">
 
-							<input class="mt-2 btn btn-info " type="submit" name="submitKolam" value="Input Data Kolam">
+								<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="submitKolam" value="Input Data Kolam">	
+							</div>
+							
 						</form>
 					</div>
 				</div>
@@ -444,11 +567,10 @@ if(isset($_POST['submit']))
                 <p class="text-muted"><?php echo "Bank: ".htmlentities($result->ban)."<br>No Rek: ".htmlentities($result->norek)."<br>Atas Nama: ".htmlentities($result->anrek);?></p>
 				</span>
 
-
-			  </div>
-
-              <!-- /.card-body -->
-            </div>
+			  </div class="width-10"><!-- /.card-body -->
+				<!-- <button class="ml-3 mr-3 mb-1 btn bg-info" href="logout.php">Logout</button> -->
+				<a href="logout.php" class="button ml-5 mr-5 mb-1 btn bg-info">Log Out</a>	
+			</div>
             <!-- /.card -->
           </div>
           <!-- /.col -->
@@ -457,223 +579,474 @@ if(isset($_POST['submit']))
               <div class="card-header p-2">
                 <ul class="nav nav-pills">
 					<li class="nav-item"><a class="nav-link active" href="#dashboard" data-toggle="tab">Dashboard</a></li>
-					<!-- <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Monitoring</a></li> -->
-					<li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Ubah Biodata</a></li>
+					<li class="nav-item"><a class="nav-link" href="#inputdata" data-toggle="tab">Input Data</a></li>
+					<li class="nav-item"><a class="nav-link" href="#ubahbiodata" data-toggle="tab">Ubah Biodata</a></li>
                 </ul>
               </div><!-- /.card-header -->
-              <div class="card-body">
-                <div class="tab-content mb-5">
-					<!-- /.tab-pane -->
-					<div class="active tab-pane" id="dashboard">
-						<div class="container-fluid">
-							<!-- Small boxes (Stat box) -->
-							<div class="row">
-							<div class="col-lg-6 col-12">
-								<!-- small box -->
-								<div class="small-box bg-info">
-								<div class="inner">
-									<h3> 0</h3>
-									<h4>Jumlah Kolam Plasma</h4>
-								</div>
-								<div class="icon">
-									<i class="fas fa-database"></i>
-								</div>
-								<a href="#" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
-								</div>
+              	<div class="card-body">
+					<div class="tab-content mb-5">
+<!-- DASHBOARD -->
+						<div class="active tab-pane" id="dashboard">
+							<div class="container-fluid">
+							
+							<?php  if($pesan==1){
+									echo "<div class='alert alert-success' role='alert'>Data Berhasil Ditambhkan</div>";
+								} else if($pesan==2){
+									echo "<div class='alert alert-danger' role='alert'>Data Gagal Ditambhkan</div>";
+								} 						
+								?>							
+								<div class="row">
+								
+									<?php 
+									//TAMPILAN DATA KOLAM PLASMA DI DASHBOARD							
+									if( $jumlahKolamPlasma>0){
+										for ($i=0; $i <  $jumlahKolamPlasma; $i++) 
+										{ 								
+											?>				
+											<div class="col-lg-6 col-12 h-75">									
+												<!-- small box -->
+												<div class="small-box bg-info ">
+												<div class="inner">	
+												<!-- <?php   ?>										 -->
+													<h3>KODE KOLAM : <?php echo $idKolamPlasma[$i]; ?></h3>
+													<h5>Jenis Kolam: Plasma</h5>	
+																
+												</div>										
+												<a href="#collapseExample<?php echo $i; ?>" data-toggle="collapse" class="small-box-footer">Selengkapnya<i class="fas fa-arrow-circle-right"></i></a>
+												<div class="collapse" id="collapseExample<?php echo $i; ?>">						
+												
+													<div class="p-3 text-left bg-info">
+												
+											
+														<div class="border-bottom border-white text-center mt-2 mb-2">
+															<h4 class="text-light font-weight-bold">28 September 2019</h4>	
+														</div>
+														<table class="h5" style="width:100%">
+															<tr class="mb-1">
+																<th>Parameter</th>
+																<th>Keterangan</th>
+															</tr>
+															<tr>
+																<td>Jumlah Ikan</td>	
+																<td>198 ekor</td>
+															</tr>
+															<tr>
+																<td>Kebutuhan Pakan</td>	
+																<td>1 kg</td>
+															</tr>
+															<tr>
+																<td>Kematian</td>	
+																<td>1 ekor</td>
+															</tr>
+															<tr>
+																<td>PH Air</td>	
+																<td>6</td>
+
+															</tr>
+															<tr>
+																<td>Suhu Air</td>	
+																<td>30 C</td>
+															</tr>
+															<tr>
+																<td>Kondisi Air</td>	
+																<td>Bagus</td>
+															</tr>
+															<tr>
+																<td>Kondisi Ikan</td>	
+																<td>Sehat</td>
+															</tr>
+														</table>										
+													</div>
+												
+												</div>
+													
+												</div>				
+											</div>			
+											<?php 
+										}
+									}
+									//TAMPILAN DATA KOLAM MANDIRI DI DASHBOARD							
+									if( $jumlahKolamMandiri>0)
+									{
+									for ($i=0; $i <  $jumlahKolamMandiri; $i++) 
+									{ 								
+										?>				
+										<div class="col-lg-6 col-12 h-75">									
+											<!-- small box -->
+											<div class="small-box bg-success ">
+											<div class="inner">	
+											<!-- <?php   ?>										 -->
+												<h3>KODE KOLAM : <?php echo $idKolamMandiri[$i];?></h3>
+												<h5>Jenis Kolam: Mandiri</h5>
+											</div>										
+											<a href="#collapseExample<?php echo $i; ?>" data-toggle="collapse" class="small-box-footer">Selengkapnya<i class="fas fa-arrow-circle-right"></i></a>
+											<div class="collapse" id="collapseExample<?php echo $i; ?>">						
+											
+												<div class="p-3 text-left bg-success">
+												<!-- <input class="btn btn-dark btn-block" type="button" value="Masukan Data Hari Ini"> -->
+												<a href="#collapseExample1<?php echo $i; ?>" data-toggle="collapse" class="small-box-footer btn bg-secondary btn-block">Masukan Data Hari Ini</a>
+											<div class="collapse text-center " id="collapseExample1<?php echo $i; ?>">
+												<form class="text-left mb-4" action="">
+													<label class="ml-2 mt-1"><h4>Ikan Mati</h4></label>
+													<input type="text" placeholder="Ikan Mati Hari Ini" class="form-control">
+													<label class="ml-2 mt-1"><h4>PH Air</h4></label>
+													<input type="text" placeholder="PH Air Hari Ini" class="form-control">	
+													<label class="ml-2 mt-1"><h4>Catatan</h4></label>
+													<textarea type="textarea" placeholder="catatan tambahan" class="form-control"></textarea>
+													<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="UpdateDataKolamHarian" value="Update Data Kolam">	
+												</form>
+											</div>
+										
+													<div class="border-bottom border-white text-center mt-2 mb-2">
+														<h4 class="text-light font-weight-bold">28 September 2019</h4>	
+													</div>
+													<table class="h5" style="width:100%">
+														<tr class="mb-1">
+															<th>Parameter</th>
+															<th>Keterangan</th>
+														</tr>
+														<tr>
+															<td>Jumlah Ikan</td>	
+															<td>198 ekor</td>
+														</tr>
+														<tr>
+															<td>Kebutuhan Pakan</td>	
+															<td>1 kg</td>
+														</tr>
+														<tr>
+															<td>Kematian</td>	
+															<td>1 ekor</td>
+														</tr>
+														<tr>
+															<td>PH Air</td>	
+															<td>6</td>
+
+														</tr>
+														<tr>
+															<td>Suhu Air</td>	
+															<td>30 C</td>
+														</tr>
+														<tr>
+															<td>Kondisi Air</td>	
+															<td>Bagus</td>
+														</tr>
+														<tr>
+															<td>Kondisi Ikan</td>	
+															<td>Sehat</td>
+														</tr>
+													</table>										
+												</div>
+											
+											</div>
+												
+											</div>				
+										</div>			
+										<?php 
+									}
+									}
+								 ?>	
+
+								</div><!-- /.row -->
+							</div><!-- /.container-fluid -->
+						</div> <!-- PENUTUP UBAH DASHBOARD-->
+<!-- INPUT DATA -->
+						<div class="tab-pane" id="inputdata">
+							<!-- Input Data Harian -->
+							<a class="btn btn-info btn-block mb-1" data-toggle="collapse" href="#collapseHarian" role="button" aria-expanded="false" aria-controls="collapseExample">
+							Input Data Harian</a>
+							<div class="collapse" id="collapseHarian">
+								<div class="card card-body">
+									<form method="POST">										
+											<div class="wrap-input100"  >
+												<label class="mt-2">Kode Kolam</label>
+												<select class="form-control" value="" name="idkolam">												
+													<?php if($jumlahKolamMandiri>0){
+														for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
+															<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
+														<?php } 
+													} if ($jumlahKolamPlasma>0){
+														for($i=0; $i<$jumlahKolamPlasma; $i++){ ?>												
+															<option name="idkolam1" value ="<?php echo $arrayIdKolamPlasma[$i]; ?>" id=""><?php echo "Kode Kolam Plasma: ".$arrayIdKolamPlasma[$i]; ?></option>
+														<?php } 
+													} ?>	
+												</select>									
+											</div>
+
+											<label class="mt-2">PH Air</label>
+											<input type="number" name="phair" class="form-control" min="0" max="14" Placeholder = "Nilai Angka 0-14" required >
+
+											<label class="mt-2">Suhu Air</label>
+											<input type="number" name="suhuair" class="form-control" min="1" max="100"  Placeholder = "Nilai Angka 0-100" required >
+											
+											<label class="mt-2">Kematian</label>
+											<input type="number" name="kematian" class="form-control" min="0"  Placeholder = "Nilai Minimum 0" required >
+
+											<label class="mt-2">Berat Pakan</label>
+											<input type="number" name="beratpakan" class="form-control" Placeholder = "Berat pakan dalam gram" required >
+											
+											<label class="mt-2">Kondisi Air</label>
+											<input type="text" name="kondisiair" class="form-control" Placeholder = "Deskripsikan keadaan air saat ini" required >
+
+											<label class="mt-2">Kondisi Ikan</label>
+											<input type="text" name="kondisiikan" class="form-control"  Placeholder = "Deskripsikan keadaan ikan saat ini" required >
+											
+											<label class="mt-2">Tanggal Pengukuran</label>
+											<input type="date" name="tanggalpengukuran" class="form-control"required >
+
+											<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="monitorharian" value="Input Data">	
+									</form>
+								</div>		
 							</div>
-							<!-- ./col -->
-							<div class="col-lg-6 col-12">
-								<!-- small box -->
-								<div class="small-box bg-info">
-								<div class="inner">
-									<h3>0</h3>
 
-									<h4>Jumlah Kolam Mandiri</h4>
-								</div>
-								<div class="icon">
-								<i class="fas fa-database"></i>
-								</div>
-								<a href="#" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
-								</div>
+							<!-- Input Data Pemasangan Kolam -->
+							<a class="btn btn-info btn-block mb-1" data-toggle="collapse" href="#collapsePasangKolam" role="button" aria-expanded="false" aria-controls="collapseExample">
+							Input Data Pemasangan Kolam</a>
+							<div class="collapse" id="collapsePasangKolam">
+								<div class="card card-body">
+										<form method="POST">										
+												<div class="wrap-input100"  >
+													<label class="mt-2">Kode Kolam</label>
+													<select class="form-control" value="" name="idkolam">												
+														<?php if($jumlahKolamMandiri>0){
+															for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
+																<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
+															<?php } 
+														} if ($jumlahKolamPlasma>0){
+															for($i=0; $i<$jumlahKolamPlasma; $i++){ ?>												
+																<option name="idkolam1" value ="<?php echo $arrayIdKolamPlasma[$i]; ?>" id=""><?php echo "Kode Kolam Plasma: ".$arrayIdKolamPlasma[$i]; ?></option>
+															<?php } 
+														} ?>	
+													</select>									
+												</div>
+
+												<label class="mt-2">Tanggal Pemasangan</label>
+												<input type="date" name="tanggalpemasangan" class="form-control" >
+
+												<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="pasangkolam">	
+										</form>
+									</div>
 							</div>
-							<!-- ./col -->
-							<div class="col-lg-6 col-12">
-								<!-- small box -->
-								<div class="small-box bg-info">
-								<div class="inner">
-									<h3>0</h3>
-									<h4>Ikan Hidup</h4>
-								</div>
-								<div class="icon">
-								<i class="fas fa-handshake"></i>
-								</div>
-								<a href="#" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
-								</div>
+
+							<!-- Input Data Masuk Bibit-->
+							<a class="btn btn-info btn-block mb-1" data-toggle="collapse" href="#collapseBibitMasuk" role="button" aria-expanded="false" aria-controls="collapseExample">
+							Input Data Bibit Masuk</a>
+							<div class="collapse" id="collapseBibitMasuk">
+								<div class="card card-body">
+								
+										<form method="POST">										
+												<div class="wrap-input100"  >
+													<label class="mt-2">Kode Kolam</label>
+													<select class="form-control" value="" name="idkolam">												
+														<?php if($jumlahKolamMandiri>0){
+															for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
+																<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
+															<?php } 
+														} if ($jumlahKolamPlasma>0){
+															for($i=0; $i<$jumlahKolamPlasma; $i++){ ?>												
+																<option name="idkolam1" value ="<?php echo $arrayIdKolamPlasma[$i]; ?>" id=""><?php echo "Kode Kolam Plasma: ".$arrayIdKolamPlasma[$i]; ?></option>
+															<?php } 
+														} ?>	
+													</select>									
+												</div>
+
+												<label class="mt-2">Populasi</label>
+												<input type="number" name="populasibibit" class="form-control" Placeholder = "Jumlah bibit" required >
+												
+												<label class="mt-2">Ukuran Bibit</label>
+												<input type="number" name="ukuranbibit" class="form-control" placeholder = "Ukuran bibit (cm)" required >
+											
+												<label class="mt-2">Berat Total Bibit</label>
+												<input type="number" name="beratbibit" class="form-control" Placeholder = "Berat total bibit (kg)" required >
+											
+												<label class="mt-2">Tanggal Masuk</label>
+												<input type="date" name="tanggalmasuk" class="form-control" required >
+
+												<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="bibitmasuk" value="Input Data">	
+										</form>
+									</div>
 							</div>
-							<!-- ./col -->
-							<div class="col-lg-6 col-12">
-								<!-- small box -->
-								<div class="small-box bg-info">
-								<div class="inner">
-									<h3>0</h3>
 
-									<h4>Ikan Mati</h4>
-								</div>
-								<div class="icon">
-								<i class="fas fa-database"></i>
-								</div>
-								<a href="#" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
-								</div>
+							<!-- Input Data Masuk Pakan-->
+							<a class="btn btn-info btn-block mb-1" data-toggle="collapse" href="#collapsePakanMasuk" role="button" aria-expanded="false" aria-controls="collapseExample">
+							Input Data Pakan Masuk</a>
+							<div class="collapse" id="collapsePakanMasuk">
+								<div class="card card-body">
+										<form method="POST">										
+												<div class="wrap-input100"  >
+													<label class="mt-2">Kode Kolam</label>
+													<select class="form-control" value="" name="idkolam">												
+														<?php if($jumlahKolamMandiri>0){
+															for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
+																<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
+															<?php } 
+														} if ($jumlahKolamPlasma>0){
+															for($i=0; $i<$jumlahKolamPlasma; $i++){ ?>												
+																<option name="idkolam1" value ="<?php echo $arrayIdKolamPlasma[$i]; ?>" id=""><?php echo "Kode Kolam Plasma: ".$arrayIdKolamPlasma[$i]; ?></option>
+															<?php } 
+														} ?>	
+													</select>									
+												</div>
+
+												<label class="mt-2">Jenis Pakan</label>
+												<input type="number" name="jenispakan" class="form-control" Placeholder = "Jenis pakan" required >
+												
+												<label class="mt-2">Jumlah Pakan Masuk</label>
+												<input type="number" name="beratpakan" class="form-control" Placeholder = "Berat Pakan (kg)" required >
+											
+												<label class="mt-2">Tanggal Masuk</label>
+												<input type="date" name="tanggalmasuk" class="form-control" required >
+
+												<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="pakanmasuk" value="Input Data">	
+										</form>
+									</div>
 							</div>
-							<!-- ./col -->
-							<div class="col-lg-6 col-12">
-								<!-- small box -->
-								<div class="small-box bg-info">
-								<div class="inner">
-									<h3>0<sup style="font-size: 20px">%</suh4></h3>
-									<h4>Rasio Kematian</h4>
-								</div>
-								<div class="icon">
-								<i class="fas fa-database"></i>
-								</div>
-								<a href="#" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
-								</div>
+
+
+							<!-- Input Data Panen-->
+							<a class="btn btn-info btn-block mb-1" data-toggle="collapse" href="#collapsePanen" role="button" aria-expanded="false" aria-controls="collapseExample">
+							Input Data Panen</a>
+							<div class="collapse" id="collapsePanen">
+								<div class="card card-body">
+										<form method="POST">										
+												<div class="wrap-input100"  >
+													<label class="mt-2">Kode Kolam</label>
+													<select class="form-control" value="" name="idkolam">
+														<?php for($i=0; $i<count($arrayIdKolamPlasma); $i++){ ?>												
+															<option name="idkolam" value ="<?php echo $arrayIdKolamPlasma[$i]; ?>" id=""><?php echo "Kolam: ".$arrayIdKolamPlasma[$i]; ?></option>
+														<?php } ?>
+													</select>									
+												</div>
+
+												<label class="mt-2">Berat Total</label>
+												<input type="number" name="berattotal" class="form-control" Placeholder = "Berat total panen (kg)" required >
+												
+												<label class="mt-2">Jumlah Ikan</label>
+												<input type="number" name="populasi" class="form-control" Placeholder = "Jumlah ikan" required >
+											
+												<label class="mt-2">Tanggal Panen</label>
+												<input type="date" name="tanggalpanen" class="form-control" required >
+
+												<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="panen" value="Input Data">	
+										</form>
+									</div>
+							</div> 
+
+						</div> <!-- PENUTUP INPUT DATA-->
+<!-- UBAH BIODATA -->
+						<div class="tab-pane" id="ubahbiodata">
+
+							<form method="post" class="form-horizontal" enctype="multipart/form-data">
+							<div class="col-sm-4 text-center">
+									<img src="images/<?php echo htmlentities($result->image);?>" style="width:200px; height:200px; border-radius:50%; margin:10px; object-fit: cover; ">
+								<input type="file" name="image" class="form-control">
+								<input type="hidden" name="image" class="form-control" value="<?php echo htmlentities($result->image);?>">
 							</div>
-							<!-- ./col -->
-							<div class="col-lg-6 col-12">
-								<!-- small box -->
-								<div class="small-box bg-info">
-								<div class="inner">
-									<h3>0 kg</h3>
 
-									<h4>Kebutuhan Pakan</h4>
-								</div>
-								<div class="icon">
-									<i class="fas fa-book-dead"></i>
-								</div>
-								<a href="#" class="small-box-footer">Selengkapnya <i class="fas fa-arrow-circle-right"></i></a>
-								</div>
-							</div>
-							<!-- ./col -->
-							</div>
-							<!-- /.row -->
-						</div><!-- /.container-fluid -->
-					</div>
-					<!-- /.tab-pane -->
-					<div class="tab-pane" id="settings">
-
-						<form method="post" class="form-horizontal" enctype="multipart/form-data">
-						<div class="col-sm-4 text-center">
-								<img src="images/<?php echo htmlentities($result->image);?>" style="width:200px; height:200px; border-radius:50%; margin:10px; object-fit: cover; ">
-							<input type="file" name="image" class="form-control">
-							<input type="hidden" name="image" class="form-control" value="<?php echo htmlentities($result->image);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">Cabang<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-							<select name="cabang"  class="form-control" required>                                                    
-								<option selected="selected" style="display:none; color:red" value="<?php echo htmlentities($result->cabang);?>"><?php echo htmlentities($result->cabang);?></option>
-								<option value="Palembang">Palembang</option>
-								<option value="Jambi">Jambi</option>
-								<option value="Prabumulih">Prabumulih</option>
-								<option value="Pali">Pali</option>
-								<option value="Keluang">Keluang</option>
-								<option value="Sungai Lilin">Sungai Lilin</option>
-								<option value="Prajen">Prajen</option>
-								<option value="Muaratara/Linggau">Muaratara/Linggau</option>
-								<option value="Banyuasin/Pangkalan Balai">Banyuasin/Pangkalan Balai</option>
-								<option value="Baturaja">Baturaja</option>
-								<option value="Pagar Alam">Pagar Alam</option>
-								<option value="Muara Enim">Muara Enim</option>
-							</select>
-							<!-- <input type="text" name="cabang" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->cabang);?>"> -->
-						</div>
-
-						<label class="col-sm-2 control-label">Nama<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="name" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->name);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">No KTP<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="ktp" id="ktp" class="form-control" placeholder="0000-0000-0000-0000" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->ktp);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">Alamat<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="alamat" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->alamat);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">Kota<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="kota" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->kota);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">Kecamatan<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="kecamatan" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->kecamatan);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">Kelurahan<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="kelurahan" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->kelurahan);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">Email<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  data-validate="Tidak Boleh Kosong">
-						<input type="email" name="email" class="form-control" readonly required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->email);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">No Hp<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="mobile" class="form-control" id="mobile" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->mobile);?>">
-						</div>
-
-						<label class="col-sm-2 control-label">Nama Panggilan<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="designation" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->designation);?>">
-						</div>
-
-							<label class="col-sm-2 control-label">Bank<span style="color:red">*</span></label>
+							<label class="col-sm-2 control-label">Cabang<span style="color:red">*</span></label>
 							<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="ban" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->ban);?>">
-						</div>
+								<select name="cabang"  class="form-control" required>                                                    
+									<option selected="selected" style="display:none; color:red" value="<?php echo htmlentities($result->cabang);?>"><?php echo htmlentities($result->cabang);?></option>
+									<option value="Palembang">Palembang</option>
+									<option value="Jambi">Jambi</option>
+									<option value="Prabumulih">Prabumulih</option>
+									<option value="Pali">Pali</option>
+									<option value="Keluang">Keluang</option>
+									<option value="Sungai Lilin">Sungai Lilin</option>
+									<option value="Prajen">Prajen</option>
+									<option value="Muaratara/Linggau">Muaratara/Linggau</option>
+									<option value="Banyuasin/Pangkalan Balai">Banyuasin/Pangkalan Balai</option>
+									<option value="Baturaja">Baturaja</option>
+									<option value="Pagar Alam">Pagar Alam</option>
+									<option value="Muara Enim">Muara Enim</option>
+								</select>
+								<!-- <input type="text" name="cabang" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->cabang);?>"> -->
+							</div>
 
-						<label class="col-sm-2 control-label">No Rekening<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-						<input type="text" name="norek" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->norek);?>">
-						</div>
+							<label class="col-sm-2 control-label">Nama<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="name" class="form-control" required Placeholder = "Nama lengkap" value="<?php echo htmlentities($result->name);?>">
+							</div>
 
-						<label class="col-sm-4 control-label">Nama Pemilik Rekening<span style="color:red">*</span></label>
-						<div class="col-sm-4">
-						<input type="text" name="anrek" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->anrek);?>">
-						</div>
+							<label class="col-sm-2 control-label">No KTP<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="ktp" id="ktp" class="form-control" placeholder="0000-0000-0000-0000" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->ktp);?>">
+							</div>
 
-						<label class="col-sm-2 control-label">Tau DHD Dari<span style="color:red">*</span></label>
-						<div class="wrap-input100 validate-input col-sm-4"  >
-							<select name="referensi"  class="form-control" required> 
-								<option value="Facebook">Facebook</option>
-								<option value="Youtube">Youtube</option>
-								<option value="Instagram">Instagram</option>
-								<option value="Teman/Keluarga">Teman/Keluarga</option>
-								<option value="Lainnya">Lainnya</option>
-							</select>
-							<!-- <input type="text" name="cabang" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->cabang);?>"> -->
-						</div>
+							<label class="col-sm-2 control-label">Alamat<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="alamat" class="form-control" required Placeholder = "Alamat tanpa nama kelurahan dan kota"   value="<?php echo htmlentities($result->alamat);?>">
+							</div>
 
-						<input type="hidden" name="editid" class="form-control" required value="<?php echo htmlentities($result->id);?>">
+							<label class="col-sm-2 control-label">Kota<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="kota" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->kota);?>">
+							</div>
 
-						<div class="form-group mt-2">
-						<div class="col-sm-8 col-sm-offset-2">
-							<button class="btn btn-info" name="submit" type="submit">Simpan Perubahan</button>
+							<label class="col-sm-2 control-label">Kecamatan<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="kecamatan" class="form-control" Placeholder = "Masukan Kecamatan" required value="<?php echo htmlentities($result->kecamatan);?>">
+							</div>
+
+							<label class="col-sm-2 control-label">Kelurahan<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="kelurahan" class="form-control" required Placeholder = "Masukan Kelurahan" value="<?php echo htmlentities($result->kelurahan);?>">
+							</div>
+
+							<label class="col-sm-2 control-label">Email<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  data-validate="Tidak Boleh Kosong">
+							<input type="email" name="email" class="form-control" readonly required  value="<?php echo htmlentities($result->email);?>">
+							</div>
+
+							<label class="col-sm-2 control-label">No Hp<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="mobile" class="form-control" id="mobile" required  value="<?php echo htmlentities($result->mobile);?>">
+							</div>
+
+							<label class="col-sm-2 control-label">Nama Panggilan<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="designation" class="form-control" required value="<?php echo htmlentities($result->designation);?>">
+							</div>
+
+								<label class="col-sm-2 control-label">Bank<span style="color:red">*</span></label>
+								<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="ban" class="form-control" required  value="<?php echo htmlentities($result->ban);?>">
+							</div>
+
+							<label class="col-sm-2 control-label">No Rekening<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+							<input type="text" name="norek" class="form-control" required  value="<?php echo htmlentities($result->norek);?>">
+							</div>
+
+							<label class="col-sm-4 control-label">Nama Pemilik Rekening<span style="color:red">*</span></label>
+							<div class="col-sm-4">
+							<input type="text" name="anrek" class="form-control" required value="<?php echo htmlentities($result->anrek);?>">
+							</div>
+
+							<label class="col-sm-2 control-label">Tau DHD Dari<span style="color:red">*</span></label>
+							<div class="wrap-input100 validate-input col-sm-4"  >
+								<select name="referensi"  class="form-control" required> 
+									<option value="Facebook">Facebook</option>
+									<option value="Youtube">Youtube</option>
+									<option value="Instagram">Instagram</option>
+									<option value="Teman/Keluarga">Teman/Keluarga</option>
+									<option value="Lainnya">Lainnya</option>
+								</select>
+								<!-- <input type="text" name="cabang" class="form-control" required oninvalid="this.setCustomValidity('Tidak Boleh Kosong')" value="<?php echo htmlentities($result->cabang);?>"> -->
+							</div>
+
+							<input type="hidden" name="editid" class="form-control" required value="<?php echo htmlentities($result->id);?>">
+
+							<div class="form-group mt-2">
+							<div class="col-sm-8 col-sm-offset-2">
+								<button class="btn btn-info" name="submit" type="submit">Simpan Perubahan</button>
+							</div>
+							</div>
+							</form>
+						</div> <!-- PENUTUP UBAH BIODATA-->
+
 						</div>
-						</div>
-						</form>
-					</div>
-					<!-- /.tab-pane -->
-					</div>
-					<!-- /.tab-content -->
-				</div><!-- /.card-body -->
+						<!-- /.tab-content -->
+					</div><!-- /.card-body -->				
 				</div>
 				<!-- /.nav-tabs-custom -->
 			</div>
@@ -684,7 +1057,7 @@ if(isset($_POST['submit']))
 		</section>
 					<!-- /.content -->
 
-
+					
 	<!-- Loading Scripts -->
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap-select.min.js"></script>
@@ -713,12 +1086,20 @@ if(isset($_POST['submit']))
 		$(function() {
 			$("#mobile").mask("0899-9999-99999",{autoclear:false});
 			$("#ktp").mask("9999-9999-9999-9999",{autoclear:false});
+			
 		});
+
+		
 	</script>
+
+
+
 	
 <div class="footer bg-warning pt-1  pl-1 pr-1">
   <p>Aplikasi ini Masih Dalam Tahapan Pengembangan<br>Masih masa uji coba</p>
 </div>
+
+
 
 </body>
 </html>
