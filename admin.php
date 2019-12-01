@@ -52,13 +52,10 @@ else{
 		while($row = mysqli_fetch_assoc($hasil))
 		{
 			$idKolamPlasma[$s] =  $row['id'];
-			$NomorKolamPlasma[$s] =  $s+1;
 			$s++;			
 		}
-		$arrayNomorKolamPlasma =  $NomorKolamPlasma;
 		$arrayIdKolamPlasma = $idKolamPlasma;
-		$jumlahKolamPlasma = count($idKolamPlasma);
-			
+		$jumlahKolamPlasma = count($idKolamPlasma);	
 	
 	}
 	
@@ -71,15 +68,12 @@ else{
 		while($row = mysqli_fetch_assoc($hasil))
 		{
 			$idKolamMandiri[$s] =  $row['id'];
-			$NomorKolamMandiri[$s] =  $s+1;
-			$s++;		
 			// Fill an array with count() number of elements with value 'id_state=?'
 			// $kalimat = array_fill(0, 1, '');
-			// $kalimat = implode(" OR id_kolam= ",$idKolamMandiri);
+			$kalimat = implode(" OR id_kolam= ",$idKolamMandiri);
 			
-				
+			$s++;			
 		}
-		$arrayNomorKolamMandiri =  $NomorKolamMandiri;
 		$arrayIdKolamMandiri = $idKolamMandiri;
 		$jumlahKolamMandiri = count($idKolamMandiri);
 	}
@@ -138,11 +132,11 @@ if(isset($_POST['submitKolam']))
 			mysqli_query($db, $sql);
 		}
 	}
-}
+
 
 
 if(isset($_POST['submit']))
-{ 
+  { 
 	$email = $_SESSION['alogin'];
 	$sql = "SELECT * from users where email = (:email);";
 	$query = $dbh -> prepare($sql);
@@ -258,8 +252,6 @@ if(isset($_POST['submit']))
 
 if(isset($_POST['monitorharian']))
 {	
-
-	// var_dump($_POST); die();
 	$monitorPHAir = $_POST['phair'];
 	$monitorSuhuAir = $_POST['suhuair'];
 	$monitorKematian = $_POST['kematian'];
@@ -267,7 +259,7 @@ if(isset($_POST['monitorharian']))
 	$monitorKondisiAir = $_POST['kondisiair'];
 	$monitorKondisiIkan = $_POST['kondisiikan'];
 	$monitorTanggal = $_POST['tanggalpengukuran'];
-	$monitorIdKolam = $_POST['idkolam'];
+	$monitorIdKolam = $_POST['idkolam1'];
 
 	$sql = "INSERT INTO monitor (suhu_air, ph_air, kematian, berat_pakan, kondisi_air, kondisi_ikan, tanggal, id_kolam) VALUES("
 	.$monitorSuhuAir.",".$monitorPHAir.",".$monitorKematian.",".$monitorBeratPakan.",'".$monitorKondisiAir."','".$monitorKondisiIkan."','".$monitorTanggal."',".$monitorIdKolam.")";
@@ -343,6 +335,7 @@ if(isset($_POST['panen']))
 	} else {$pesan = 2;}
 	
 }
+}
 
 
 ?>
@@ -357,7 +350,7 @@ if(isset($_POST['panen']))
 	<meta name="description" content="">
 	<meta name="author" content="">
 	<meta name="theme-color" content="#3e454c">
-	<title>Edit Profile</title>
+	<title>ADMIN</title>
 	<!-- Font awesome -->
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="icon" type="image/png" href="login/images/icons/favicon-dhd.png" />
@@ -499,7 +492,7 @@ if(isset($_POST['panen']))
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Profile Mitra</h1>
+            <h1>ADMIN</h1>
           </div>		  
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -606,55 +599,30 @@ if(isset($_POST['panen']))
             <div class="card">
               <div class="card-header p-2">
                 <ul class="nav nav-pills">
-					<li class="nav-item"><a class="nav-link active" href="#dashboard" data-toggle="tab">Dashboard</a></li>
-					<?php if($jumlahKolamMandiri>0){ ?>
-					<li class="nav-item"><a class="nav-link" href="#inputdata" data-toggle="tab">Input Data</a></li>
-					<?php } ?>
+					<li class="nav-item"><a class="nav-link active" href="#inputdata" data-toggle="tab">Input Data</a></li>			
+						
 					<li class="nav-item"><a class="nav-link" href="#ubahbiodata" data-toggle="tab">Ubah Biodata</a></li>
                 </ul>
               </div><!-- /.card-header -->
               	<div class="card-body">
 					<div class="tab-content mb-5">
-<!-- DASHBOARD -->
-						<div class="active tab-pane" id="dashboard">
-							<div class="container-fluid">
-							
-							<?php  if($pesan==1){
-									echo "<div class='alert alert-success' role='alert'>Data Berhasil Ditambhkan</div>";
-								} else if($pesan==2){
-									echo "<div class='alert alert-danger' role='alert'>Data Gagal Ditambhkan</div>";
-								} 						
-								?>							
-								<div class="row">
-						
-									<?php 		
-									//TAMPILAN DATA KOLAM MANDIRI DI DASHBOARD							
-									if( $jumlahKolamMandiri>0){
-										
-										for ($i=0; $i <  $jumlahKolamMandiri; $i++) 
-										{ 								
-											?>				
-											<div class="col-lg-6 col-12 h-75">									
-												<!-- small box -->
-												<div class="small-box bg-success ">
-												<div class="inner">	
-												<!-- <?php   ?>										 -->
-													<h3>Nomor Kolam : <?php echo $NomorKolamMandiri[$i]; ?></h3>
-													<h5>Jenis Kolam: Mandiri</h5>	
-																
-												</div>										
-												<a href="#collapseExamplem<?php echo $i; ?>" data-toggle="collapse" class="small-box-footer">Selengkapnya<i class="fas fa-arrow-circle-right"></i></a>
-												<div class="collapse" id="collapseExamplem<?php echo $i; ?>">	
-												
-												<!-- Input Data Harian -->
-												<a class="btn btn-info btn-block mt-3" data-toggle="collapse" href="#collapseHarian<?php echo $i; ?>" role="button" aria-expanded="false" aria-controls="collapseExample">
+<!-- INPUT DATA -->		
+                        <div class="active tab-pane" id="inputdata">
+							<!-- Input Data Harian -->
+							<a class="btn btn-info btn-block mb-1" data-toggle="collapse" href="#collapseHarian" role="button" aria-expanded="false" aria-controls="collapseExample">
 							Input Data Harian</a>
-							<div class="collapse" id="collapseHarian<?php echo $i; ?>">
-								<div class="card card-body bg-success">
-									<form method="POST">							
-											
-											<input  type="hidden" name="idkolam"  value ="<?php echo $arrayIdKolamMandiri[$i]; ?>">
-											
+							<div class="collapse" id="collapseHarian">
+								<div class="card card-body">
+									<form method="POST">										
+											<div class="wrap-input100"  >
+												<label class="mt-2">Kode Kolam</label>
+												<select class="form-control" value="" name="idkolam">												
+													<?php for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
+															<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
+													<?php } ?>	
+												</select>									
+											</div>
+
 											<label class="mt-2">PH Air</label>
 											<input type="number" name="phair" class="form-control" min="0" max="14" Placeholder = "Nilai Angka 0-14" required >
 
@@ -681,145 +649,6 @@ if(isset($_POST['panen']))
 								</div>		
 							</div>
 
-
-
-
-
-
-
-
-
-
-
-
-												
-													<div class="p-3 text-left bg-success">											
-											
-														<div class="border-bottom border-white text-center mt-2 mb-2">
-															<h4 class="text-light font-weight-bold">28 September 2019</h4>	
-														</div>
-														<table class="h5" style="width:100%">
-															<tr class="mb-1">
-																<th>Parameter</th>
-																<th>Keterangan</th>
-															</tr>
-															<tr>
-																<td>Jumlah Ikan</td>	
-																<td>198 ekor</td>
-															</tr>
-															<tr>
-																<td>Kebutuhan Pakan</td>	
-																<td>1 kg</td>
-															</tr>
-															<tr>
-																<td>Kematian</td>	
-																<td>1 ekor</td>
-															</tr>
-															<tr>
-																<td>PH Air</td>	
-																<td>6</td>
-
-															</tr>
-															<tr>
-																<td>Suhu Air</td>	
-																<td>30 C</td>
-															</tr>
-															<tr>
-																<td>Kondisi Air</td>	
-																<td>Bagus</td>
-															</tr>
-															<tr>
-																<td>Kondisi Ikan</td>	
-																<td>Sehat</td>
-															</tr>
-														</table>										
-													</div>
-												
-												</div>
-													
-												</div>				
-											</div>			
-											<?php 
-										}
-									}
-									//TAMPILAN DATA KOLAM PLASMA DI DASHBOARD							
-									if( $jumlahKolamPlasma>0){
-										for ($i=0; $i <  $jumlahKolamPlasma; $i++) 
-										{ 								
-											?>				
-											<div class="col-lg-6 col-12 h-75">									
-												<!-- small box -->
-												<div class="small-box bg-info ">
-												<div class="inner">	
-												<!-- <?php   ?>										 -->
-													<h3>Nomor Kolam : <?php echo $NomorKolamPlasma[$i]; ?></h3>
-													<h5>Jenis Kolam: Plasma</h5>	
-																
-												</div>										
-												<a href="#collapseExample<?php echo $i; ?>" data-toggle="collapse" class="small-box-footer">Selengkapnya<i class="fas fa-arrow-circle-right"></i></a>
-												<div class="collapse" id="collapseExample<?php echo $i; ?>">						
-												
-													<div class="p-3 text-left bg-info">
-												
-											
-														<div class="border-bottom border-white text-center mt-2 mb-2">
-															<h4 class="text-light font-weight-bold">28 September 2019</h4>	
-														</div>
-														<table class="h5" style="width:100%">
-															<tr class="mb-1">
-																<th>Parameter</th>
-																<th>Keterangan</th>
-															</tr>
-															<tr>
-																<td>Jumlah Ikan</td>	
-																<td>198 ekor</td>
-															</tr>
-															<tr>
-																<td>Kebutuhan Pakan</td>	
-																<td>1 kg</td>
-															</tr>
-															<tr>
-																<td>Kematian</td>	
-																<td>1 ekor</td>
-															</tr>
-															<tr>
-																<td>PH Air</td>	
-																<td>6</td>
-
-															</tr>
-															<tr>
-																<td>Suhu Air</td>	
-																<td>30 C</td>
-															</tr>
-															<tr>
-																<td>Kondisi Air</td>	
-																<td>Bagus</td>
-															</tr>
-															<tr>
-																<td>Kondisi Ikan</td>	
-																<td>Sehat</td>
-															</tr>
-														</table>										
-													</div>
-												
-												</div>
-													
-												</div>				
-											</div>			
-											<?php 
-										}
-									}
-									
-								 ?>	
-
-								</div><!-- /.row -->
-							</div><!-- /.container-fluid -->
-						</div> <!-- PENUTUP UBAH DASHBOARD-->
-<!-- INPUT DATA -->		
-						<?php if($jumlahKolamMandiri>0){ ?>
-						<div class="tab-pane" id="inputdata">
-							
-
 							<!-- Input Data Pemasangan Kolam -->
 							<a class="btn btn-info btn-block mb-1" data-toggle="collapse" href="#collapsePasangKolam" role="button" aria-expanded="false" aria-controls="collapseExample">
 							Input Data Pemasangan Kolam</a>
@@ -830,7 +659,7 @@ if(isset($_POST['panen']))
 												<label class="mt-2">Kode Kolam</label>
 												<select class="form-control" value="" name="idkolam">												
 													<?php for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
-															<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "No Kolam Mandiri: ".$NomorKolamMandiri[$i]; ?></option>
+															<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
 													<?php } ?>	
 												</select>									
 											</div>
@@ -854,7 +683,7 @@ if(isset($_POST['panen']))
 													<label class="mt-2">Kode Kolam</label>
 													<select class="form-control" value="" name="idkolam">												
 														<?php for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
-																<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "No Kolam Mandiri: ".$NomorKolamMandiri[$i]; ?></option>
+																<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
 														<?php } ?>	
 													</select>									
 												</div>
@@ -886,7 +715,7 @@ if(isset($_POST['panen']))
 												<label class="mt-2">Kode Kolam</label>
 													<select class="form-control" value="" name="idkolam">												
 														<?php for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
-																<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "No Kolam Mandiri: ".$NomorKolamMandiri[$i]; ?></option>
+																<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
 														<?php } ?>	
 													</select>									
 												</div>
@@ -916,7 +745,7 @@ if(isset($_POST['panen']))
 												<label class="mt-2">Kode Kolam</label>
 												<select class="form-control" value="" name="idkolam">												
 													<?php for($i=0; $i<$jumlahKolamMandiri; $i++){ ?>												
-															<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "No Kolam Mandiri: ".$NomorKolamMandiri[$i]; ?></option>
+															<option name="idkolam1" value ="<?php echo $arrayIdKolamMandiri[$i]; ?>" id=""><?php echo "Kode Kolam Mandiri: ".$arrayIdKolamMandiri[$i]; ?></option>
 													<?php } ?>	
 												</select>									
 											</div>
@@ -936,7 +765,7 @@ if(isset($_POST['panen']))
 							</div> 
 
 						</div> <!-- PENUTUP INPUT DATA-->
-						<?php } else if (true){}?>
+				
 <!-- UBAH BIODATA -->
 						<div class="tab-pane" id="ubahbiodata">
 

@@ -80,3 +80,8 @@
 <div class="alert alert-info" role="alert">Info</div>
 <div class="alert alert-warning" role="alert">Warning</div>
 <div class="alert alert-danger" role="alert">Danger</div>
+
+<!-- Date Picker-->
+<script type= "text/javascript" src="js/datepicker.js"></script>
+<script type="text/javascript">
+	// Data Picker Initialization

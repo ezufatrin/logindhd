@@ -2,25 +2,40 @@
 
 session_start();
 include('includes/config.php');
+if(isset($_SESSION['alogin'])){
+	header('location:profile.php');
+}
+
 if(isset($_POST['login']))
 {
-$status='1';
-$email=$_POST['username'];
-$password=md5($_POST['password']);
-$sql ="SELECT email,password FROM users WHERE email=:email and password=:password and status=(:status)";
-$query= $dbh -> prepare($sql);
-$query-> bindParam(':email', $email, PDO::PARAM_STR);
-$query-> bindParam(':password', $password, PDO::PARAM_STR);
-$query-> bindParam(':status', $status, PDO::PARAM_STR);
-$query-> execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-if($query->rowCount() > 0)
-{
-$_SESSION['alogin']=$_POST['username'];
-echo "<script type='text/javascript'> document.location = 'profile.php'; </script>";
-} else{ 
-  echo "<script>alert('Username atau Passwordnya Salah');</script>";
-}
+	// $status='1';
+	// $role = '1';
+	$email=$_POST['username'];
+	$password=md5($_POST['password']);
+	
+		$sql ="SELECT email,password,status FROM users WHERE email=:email and password=:password";
+		$query= $dbh -> prepare($sql);
+		$query-> bindParam(':email', $email, PDO::PARAM_STR);
+		$query-> bindParam(':password', $password, PDO::PARAM_STR);
+	$query-> execute();
+	$results=$query->fetchAll(PDO::FETCH_OBJ);
+	if($query->rowCount() > 0)
+	{
+		// var_dump($results);
+		// var_dump(get_object_vars($results[0])); die();	
+		$status = get_object_vars($results[0])['status'];
+
+		$_SESSION['alogin']=$_POST['username'];		
+		if($status == 1){			
+			echo "<script type='text/javascript'> document.location = 'profile.php'; </script>";
+		} else if($status == 2){
+			echo "<script type='text/javascript'> document.location = 'admin.php'; </script>";
+		}
+		
+		
+	} else{ 
+		echo "<script>alert('Username atau Passwordnya Salah');</script>";
+	}
 
 }
 ?>
