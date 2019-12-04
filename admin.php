@@ -6,11 +6,11 @@ include('includes/config.php');
 include('proses.php');
 if(strlen($_SESSION['alogin'])==0)
 	{
-header('location:index.php');
+header('location:login.php');
 }
 else{
 	$email = $_SESSION['alogin'];
-	$sql = "SELECT * FROM users Where status=1";
+	$sql = "SELECT * FROM users Where status= 1 ORDER BY name ASC";
 	$hasil = mysqli_query($db, $sql);
 	$j=0;
 	while($row = mysqli_fetch_assoc($hasil))
@@ -19,10 +19,12 @@ else{
 		$arrayNamaUser[$j] = $row['name'];
 		$j++;
 	}
+	
 
 if(isset ($_POST['pilihmitra']))
 {	
 	$idMitra = $_POST['idMitra'];	
+	
 	$sql = "SELECT * FROM users Where status=1 and id=".$idMitra;	
 	$hasil = mysqli_query($db, $sql);
 	while($row = mysqli_fetch_assoc($hasil))
@@ -34,8 +36,6 @@ if(isset ($_POST['pilihmitra']))
 		$cabangUser = $row['cabang'];
 		$image = $row['image'];
 	}
-	
-
 }
 	
 $idedit =	$_SESSION['admin'];
@@ -361,9 +361,6 @@ if(isset($_POST['panen']))
 	} else {$pesan = 2;}	
 }
 
-
-
-
 ?>
 
 <!doctype html>
@@ -474,6 +471,78 @@ if(isset($_POST['panen']))
 		$cabangUser = $row['cabang'];
 		$image = $row['image'];
 	}
+
+
+	
+$sql = "SELECT * FROM kolam WHERE  id_pemilik = ".$idedit;
+$hasil = mysqli_query($db, $sql);
+
+$DataKolam=array(); 
+
+while ($dataKolam=mysqli_fetch_assoc($hasil)) {
+ $x['id']=$dataKolam['id'];
+ $x['jenis']=$dataKolam['jenis']; 
+ $x['id_pemilik']=$dataKolam['id_pemilik'];
+ $x['tanggal_booking']=$dataKolam['tanggal_booking'];
+ $x['tanggal_pasang']=$dataKolam['tanggal_pasang'];
+ $x['tanggal_penyelesaian']=$dataKolam['tanggal_penyelesaian'];
+ $x['bibit']=array();
+          $sqlBibit = "SELECT * FROM bibit WHERE id_kolam=".$dataKolam['id'];
+          $hasilBibit = mysqli_query($db, $sqlBibit);
+
+          while ($dataBibit=mysqli_fetch_assoc($hasilBibit)) {   
+            $y['id']=$dataBibit['id'];
+            $y['berat']=$dataBibit['berat'];
+            $y['ukuran']=$dataBibit['ukuran'];
+            $y['populasi']=$dataBibit['populasi'];
+            $y['tanggal_masuk']=$dataBibit['tanggal_masuk'];
+            $y['id_kolam']=$dataBibit['id_kolam'];
+            array_push($x['bibit'], $y);}
+            
+  $x['sampling']=array();
+          $sqlSampling = "SELECT * FROM sampling WHERE id_kolam=".$dataKolam['id'];
+          $hasilSampling = mysqli_query($db, $sqlSampling);
+
+          while ($dataSampling=mysqli_fetch_assoc($hasilSampling)) {   
+            $y['id']=$dataSampling['id'];
+            $y['populasi']=$dataSampling['populasi'];
+            $y['ukuran']=$dataSampling['ukuran'];
+            $y['berat']=$dataSampling['berat'];
+            $y['tanggal_sampling']=$dataSampling['tanggal_sampling'];
+            $y['id_kolam']=$dataSampling['id_kolam'];
+            array_push($x['sampling'], $y);}
+            
+  $x['monitor']=array();
+          $sqlMonitor = "SELECT * FROM monitor WHERE id_kolam=".$dataKolam['id']." ORDER BY `id` DESC";
+          $hasilMonitor = mysqli_query($db, $sqlMonitor);
+
+          while ($dataMonitor=mysqli_fetch_assoc($hasilMonitor)) {   
+            $y['id']=$dataMonitor['id'];
+            $y['suhu_air']=$dataMonitor['suhu_air'];
+            $y['ph_air']=$dataMonitor['ph_air'];
+            $y['kematian']=$dataMonitor['kematian'];
+            $y['berat_pakan']=$dataMonitor['berat_pakan'];
+            $y['kondisi_air']=$dataMonitor['kondisi_air'];
+            $y['kondisi_ikan']=$dataMonitor['kondisi_ikan'];
+            $y['tanggal']=$dataMonitor['tanggal'];
+            $y['id_kolam']=$dataMonitor['id_kolam'];
+            array_push($x['monitor'], $y);}
+            
+  $x['panen']=array();
+          $sqlPanen = "SELECT * FROM panen WHERE id_kolam=".$dataKolam['id'];
+          $hasilPanen = mysqli_query($db, $sqlPanen);
+
+          while ($dataPanen=mysqli_fetch_assoc($hasilPanen)) {   
+            $y['id']=$dataPanen['id'];
+            $y['berat']=$dataPanen['suhu_air'];
+            $y['populasi']=$dataPanen['ph_air'];
+            $y['tanggal_panen']=$dataPanen['kematian'];
+            $y['id_kolam']=$dataPanen['id_kolam'];
+            array_push($x['panen'], $y);}
+            
+ // untuk menambah array setelah array yang terakhir
+ array_push($DataKolam, $x);
+}
 	
 	?>
 
@@ -536,7 +605,7 @@ if(isset($_POST['panen']))
 							<select class="form-control" value="" name="idMitra">	
 								<option selected="selected" style="display:none; color:red" >Pilih Mitra</option>											
 								<?php for($i=0; $i<count($arrayNamaUser); $i++){ ?>	
-										<option name="idMitra1" value ="<?php echo $arrayIdUser[$i]; ?>" id=""><?php echo $arrayNamaUser[$i]; ?></option>
+										<option name="idMitra1" value ="<?php echo $arrayIdUser[$i]; ?>" id=""><?php echo ucwords($arrayNamaUser[$i]); ?></option>
 								<?php } ?>	
 							</select>
 							<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="pilihmitra" value="Pilih Mitra">	
@@ -567,166 +636,137 @@ if(isset($_POST['panen']))
 								<div class="row">	
 								<?php 				
 									
-									//TAMPILAN DATA KOLAM PLASMA DI DASHBOARD	
-									?>
-										<div class="container text-left">
-											<h3>KOLAM PLASMA</h3>
-											
-										</div>
-										
-									<?php 
-														
-									if( $jumlahKolamPlasma>0){
-										if ($jumlahKolamPlasma>=10){
-											// $disp=
-										}
 
-										for ($i=0; $i <$jumlahKolamPlasma; $i++) 
+									if( count($DataKolam) >0 ){
+										
+										for ($i=0; $i < count($DataKolam); $i++) 
 										{ 								
 											?>				
 											<div class="col-lg-6 col-12 h-75">									
 												<!-- small box -->
-												<div class="small-box bg-info ">
+												<?php if($DataKolam[$i]['jenis'] == "Plasma") {?>
+												<div class="small-box bg-info "> <?php } else if($DataKolam[$i]['jenis'] == "Mandiri"){  ?>
+												<div class="small-box bg-success "> <?php } ?>
 												<div class="inner">	
-												<!-- <?php   ?>										 -->
-													<h3>Nomor Kolam : <?php echo $NomorKolamPlasma[$i]; ?></h3>
-													<h5>Jenis Kolam: Plasma</h5>				
-												</div>										
-												<a href="#collapseExample<?php echo $i; ?>" data-toggle="collapse" class="small-box-footer">Selengkapnya<i class="fas fa-arrow-circle-right"></i></a>
-												<div class="collapse" id="collapseExample<?php echo $i; ?>">
-													<div class="p-3 text-left bg-info">
-														<div class="border-bottom border-white text-center mt-2 mb-2">
-															<h4 class="text-light font-weight-bold">28 September 2019</h4>	
-														</div>
-														<table class="h5" style="width:100%">
-															<tr class="mb-1">
-																<th>Parameter</th>
-																<th>Keterangan</th>
-															</tr>
-															<tr>
-																<td>Jumlah Ikan</td>	
-																<td>198 ekor</td>
-															</tr>
-															<tr>
-																<td>Kebutuhan Pakan</td>	
-																<td>1 kg</td>
-															</tr>
-															<tr>
-																<td>Kematian</td>	
-																<td>1 ekor</td>
-															</tr>
-															<tr>
-																<td>PH Air</td>	
-																<td>6</td>
-
-															</tr>
-															<tr>
-																<td>Suhu Air</td>	
-																<td>30 C</td>
-															</tr>
-															<tr>
-																<td>Kondisi Air</td>	
-																<td>Bagus</td>
-															</tr>
-															<tr>
-																<td>Kondisi Ikan</td>	
-																<td>Sehat</td>
-															</tr>
-														</table>										
-													</div>
-												
-												</div>
-													
-												</div>				
-											</div>			
-											<?php 
-										}
-									}	
-									?>
-									<div class="container text-center">
-										<ul class="pagination pagination-sm m-0 text-center">
-											<li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-											<li class="page-item"><a class="page-link" href="#">1</a></li>
-											<li class="page-item"><a class="page-link" href="#">2</a></li>
-											<li class="page-item"><a class="page-link" href="#">3</a></li>
-											<li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-										</ul>
-									</div>
-							
-									<?php 
 									
-									//TAMPILAN DATA KOLAM PLASMA DI DASHBOARD	
-									?>
-										<div class="container text-center">
-											<h3>KOLAM MANDIRI</h3>
-										</div>
-										
-									<?php 
-											
-									if( $jumlahKolamMandiri>0){
-										for ($i=0; $i <$jumlahKolamMandiri; $i++) 
-										{ 								
-											?>				
-											<div class="col-lg-6 col-12 h-75">									
-												<!-- small box -->
-												<div class="small-box bg-success ">
-												<div class="inner">	
-												<!-- <?php   ?>										 -->
-													<h3>Nomor Kolam : <?php echo $NomorKolamMandiri[$i]; ?></h3>
-													<h5>Jenis Kolam: Mandiri</h5>				
-												</div>										
-												<a href="#collapseMandiri<?php echo $i; ?>" data-toggle="collapse" class="small-box-footer">Selengkapnya<i class="fas fa-arrow-circle-right"></i></a>
-												<div class="collapse" id="collapseMandiri<?php echo $i; ?>">
-													<div class="p-3 text-left bg-success">
-														<div class="border-bottom border-white text-center mt-2 mb-2">
-															<h4 class="text-light font-weight-bold">28 September 2019</h4>	
-														</div>
-														<table class="h5" style="width:100%">
-															<tr class="mb-1">
-																<th>Parameter</th>
-																<th>Keterangan</th>
-															</tr>
-															<tr>
-																<td>Jumlah Ikan</td>	
-																<td>198 ekor</td>
-															</tr>
-															<tr>
-																<td>Kebutuhan Pakan</td>	
-																<td>1 kg</td>
-															</tr>
-															<tr>
-																<td>Kematian</td>	
-																<td>1 ekor</td>
-															</tr>
-															<tr>
-																<td>PH Air</td>	
-																<td>6</td>
+													<h3>Nomor Kolam : <?php echo $i+1; ?></h3>
+                          <h5>Jenis Kolam: <?php echo $DataKolam[$i]['jenis'] ?></h5>
+                          <?php                     
 
-															</tr>
-															<tr>
-																<td>Suhu Air</td>	
-																<td>30 C</td>
-															</tr>
-															<tr>
-																<td>Kondisi Air</td>	
-																<td>Bagus</td>
-															</tr>
-															<tr>
-																<td>Kondisi Ikan</td>	
-																<td>Sehat</td>
-															</tr>
-														</table>										
-													</div>
-												
-												</div>
+													if(!($DataKolam[$i]['tanggal_penyelesaian'] == "0000-00-00")){
 													
-												</div>				
-											</div>			
-											<?php 
-										}
-									}	
-								 ?>	
+                            }	
+                          else if( !($DataKolam[$i]['tanggal_pasang']=="0000-00-00")){
+                            echo" <h5 class='text-warning'>Status: Masa pemasangan<h5>";
+                          }
+                          else if( !($DataKolam[$i]['tanggal_booking']=="0000-00-00")){
+                            echo" <h5 class='text-warning'>Status: Booking<h5>";
+                          }?>	
+																
+						</div>										
+						<a href="#collapseExamplem<?php echo $i; ?>" data-toggle="collapse" class="small-box-footer">Selengkapnya<i class="fas fa-arrow-circle-right"></i></a>
+						<div class="collapse" id="collapseExamplem<?php echo $i; ?>">	
+						
+						<!-- Input Data Harian -->
+						<a class="btn btn-info btn-block mt-3" data-toggle="collapse" href="#collapseHarian<?php echo $i; ?>" role="button" aria-expanded="false" aria-controls="collapseExample">
+						Input Data Harian</a>
+								<div class="collapse" id="collapseHarian<?php echo $i; ?>">								
+									<div class="card card-body bg-success">
+									<form method="POST">							
+										
+										<input  type="hidden" name="idkolam"  value ="<?php echo $DataKolam[$i]['id']; ?>">
+										
+										<label class="mt-2">PH Air</label>
+										<input type="number" name="phair" class="form-control" min="0" max="14" Placeholder = "Nilai Angka 0-14" required >
 
+										<label class="mt-2">Suhu Air</label>
+										<input type="number" name="suhuair" class="form-control" min="1" max="100"  Placeholder = "Nilai Angka 0-100" required >
+										
+										<label class="mt-2">Kematian</label>
+										<input type="number" name="kematian" class="form-control" min="0"  Placeholder = "Nilai Minimum 0" required >
+
+										<label class="mt-2">Berat Pakan</label>
+										<input type="number" name="beratpakan" class="form-control" Placeholder = "Berat pakan dalam gram" required >
+										
+										<label class="mt-2">Kondisi Air</label>
+										<input type="text" name="kondisiair" class="form-control" Placeholder = "Deskripsikan keadaan air saat ini" required >
+
+										<label class="mt-2">Kondisi Ikan</label>
+										<input type="text" name="kondisiikan" class="form-control"  Placeholder = "Deskripsikan keadaan ikan saat ini" required >
+										
+										<label class="mt-2">Tanggal Pengukuran</label>
+										<input type="date" name="tanggalpengukuran" class="form-control"required >
+
+										<input class="mt-3  pt-2 pb-2 btn btn-info" type="submit" name="monitorharian" value="Input Data">	
+								</form>
+							</div>		
+						</div>
+						<div class="p-3 text-left bg-success">											
+						
+						<?php for ($g=0; $g < count($DataKolam[$i]['monitor']); $g++) 
+						{ 
+							$tanggal = $DataKolam[$i]['monitor'][$g]['tanggal'];                                 
+							$kematian = $DataKolam[$i]['monitor'][$g]['kematian'];
+							$totalKematian = $totalKematian+$DataKolam[$i]['monitor'][$g]['kematian'];
+							$jumlahIkan =  $DataKolam[$i]['bibit'][0]['populasi']-$totalKematian;   
+							$phAir = $DataKolam[$i]['monitor'][$g]['ph_air'];
+							$suhuAir = $DataKolam[$i]['monitor'][$g]['suhu_air'];
+							$kondisiAir = $DataKolam[$i]['monitor'][$g]['kondisi_air'] ;
+							$kondisiIkan = $DataKolam[$i]['monitor'][$g]['kondisi_ikan']; ?>
+
+							<div class="border-bottom border-white text-center mt-2 mb-2">
+								<h4 class="text-light font-weight-bold"><?php echo  $tanggal; ?></h4>	
+							</div>
+							<table class="h5" style="width:100%">
+								<tr class="mb-1">
+									<th>Parameter</th>
+									<th>Keterangan</th>
+								</tr>
+								<tr>
+									<td>Jumlah Ikan</td>	
+									<td><?php echo  $jumlahIkan;?> </td>
+								</tr>
+								<tr>
+									<td>Kebutuhan Pakan</td>	
+									<td>1 kg</td>
+								</tr>
+								<tr>
+									<td>Kematian</td>	
+									<td><?php echo  $jumlahIkan;?> </td>
+								</tr>
+								<tr>
+									<td>PH Air</td>	
+									<td><?php echo  $phAir;?> </td>
+
+								</tr>
+								<tr>
+									<td>Suhu Air</td>	
+									<td><?php echo  $suhuAir;?> </td>
+								</tr>
+								<tr>
+									<td>Kondisi Air</td>	
+									<td><?php echo  $kondisiAir;?> </td>
+								</tr>
+								<tr>
+									<td>Kondisi Ikan</td>	
+									<td><?php echo  $kondisiIkan;?> </td>
+								</tr>
+							</table>
+									
+				<?php 	} $totalKematian=0; ?>
+												</div>
+											
+											</div>
+												
+											</div>				
+										</div>			
+										<?php 
+									}
+								}
+
+								?>
+										
+								
 								</div><!-- /.row -->
 							</div><!-- /.container-fluid -->
 						</div> <!-- PENUTUP UBAH DASHBOARD-->
