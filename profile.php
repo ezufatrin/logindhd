@@ -623,7 +623,7 @@ while ($dataKolam=mysqli_fetch_assoc($hasil)) {
  array_push($DataKolam, $x);
 }
 
-//  echo '<pre>' . var_export($DataKolam, true) . '</pre>';
+echo '<pre>' . var_export($DataKolam, true) . '</pre>';
 
 // $NoK=0; $No=0;
 // 	for ($i=0; $i < COUNT($DataKolam); $i++) { 
@@ -1102,7 +1102,7 @@ while ($dataKolam=mysqli_fetch_assoc($hasil)) {
 
 								</div><!-- /.row -->
 							</div><!-- /.container-fluid -->
-						</div> <!-- PENUTUP UBAH DASHBOARD-->
+						</div> 
 <!-- INPUT DATA -->		
 						<?php if($jumlahKolamMandiri>0){ ?>
 						<div class="tab-pane" id="inputdata">						
