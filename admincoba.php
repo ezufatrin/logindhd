@@ -797,63 +797,8 @@ $dataKolam = dataKolam($idedit);
 					<div class="tab-content mb-5">
 <!-- DASHBOARD -->
                     <div class="active tab-pane" id="dashboard">
-                        <div class="container-fluid"> 
-                            
-                        <div class="card <?php echo $hideAdmin?>">   
-                                <div class="card-body table-responsive pt-2">
-                                <!-- <table class="table table-hover"> -->
-                                <table id="example1" class="table table-bordered">
-                                    <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Tanggal Permintaan</th>
-                                        <th>Periode Pakan</th>
-                                        <th>Periode Pemeliharaan</th>
-                                        <th>Kolam Ke</th>
-                                        <th>Ukuran Ikan</th>
-                                        <th>Populasi Awal Masuk (Ekor)</th>
-                                        <th>Jumlah Kematian (Ekor)</th>
-                                        <th>Populasi Ikan Hidup(Ekor)</th>
-                                        <th>Populasi Sampling</th>
-                                        <th>Berat Sampling</th>
-                                        <th>Berat Rata-rata</th>
-                                        <th>Berat Total</th>
-                                        <th>FR (%)</th>
-                                        <th>Pakan Per Hari (gr)</th>
-                                        <th>Total Pakan</th>
-                                        <th>Ukuran Pakan</th>
-                                        <th>Tanggal Penerimaan Pakan</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        
-                                <?php            $list=0;                   
-                                for ($z=0; $z < count($dataKolam); $z++) {  $list++;?>
-                                    <tr>
-                                        <td> <?= $list; ?> </td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td> 
-                                    </tr>     
-                                <?php } ?>                               
-                                    </tbody>
-                                </table>
-                                </div>
-                            </div>                        
+                        <div class="container-fluid">                            
+                                              
         
                             <?php for ($i=1; $i <= $pages; $i++) { ?>    
                                 <a class="btn btn-info mb-2" href="admincoba.php?halaman=<?php echo $i; ?>" style="text-decoration:none"><u><?php echo $i; ?></u></a>
@@ -890,10 +835,7 @@ $dataKolam = dataKolam($idedit);
                                $jumlahMandiriTotal =  $jumlahMandiriPending + $jumlahMandiriBooking + $jumlahMandiriTerpasang;
                                echo "<h4>Filter dari:<br> ". tgl_indo($tanggalMulai). " - ".tgl_indo($tanggalAkhir)."</h4>";  
                             }
-
-
-
-                            
+                           
                             ?>                            
 
 
@@ -1137,6 +1079,11 @@ $dataKolam = dataKolam($idedit);
                                                     </div>
                                                 </div>
                                                 <!-- ./col -->
+
+
+
+
+                                            
                              <?php        
                                 }
 
@@ -1288,6 +1235,62 @@ $dataKolam = dataKolam($idedit);
                                 }
                             }?>
                             </div>
+
+                            <div class="card <?php echo $hideAdmin?>">   
+                                <div class="card-body table-responsive pt-2">
+                                <!-- <table class="table table-hover"> -->
+                                <table id="example1" class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Tanggal Permintaan</th>
+                                        <th>Periode Pakan</th>
+                                        <th>Periode Pemeliharaan</th>
+                                        <th>Kolam Ke</th>
+                                        <th>Ukuran Ikan</th>
+                                        <th>Populasi Awal Masuk (Ekor)</th>
+                                        <th>Jumlah Kematian (Ekor)</th>
+                                        <th>Populasi Ikan Hidup(Ekor)</th>
+                                        <th>Populasi Sampling</th>
+                                        <th>Berat Sampling</th>
+                                        <th>Berat Rata-rata</th>
+                                        <th>Berat Total</th>
+                                        <th>FR (%)</th>
+                                        <th>Pakan Per Hari (gr)</th>
+                                        <th>Total Pakan</th>
+                                        <th>Ukuran Pakan</th>
+                                        <th>Tanggal Penerimaan Pakan</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                <?php            $list=0;                   
+                                for ($z=0; $z < count($dataKolam); $z++) {  $list++;?>
+                                    <tr>
+                                        <td> <?= $list; ?> </td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td>
+                                        <td>175</td> 
+                                    </tr>     
+                                <?php } ?>                               
+                                    </tbody>
+                                </table>
+                                </div>
+                            </div> 
 	                                
                             <div class="row"> <?php 
                             //Tampilan Dashboard Kolam Mandiri

@@ -26,9 +26,10 @@ if(isset($_POST['login']))
 		$status = get_object_vars($results[0])['status'];
 
 		$_SESSION['alogin']=$_POST['username'];		
-		if($status == 1){			
+		if($status == 1){					
 			echo "<script type='text/javascript'> document.location = 'profile.php'; </script>";
 		} else if($status == 2){
+			$_SESSION ['awal'] = 1;	
 			echo "<script type='text/javascript'> document.location = 'admin.php'; </script>";
 		}
 		
@@ -118,7 +119,7 @@ if(isset($_POST['login']))
 			</div>
 		</div>
 	</div>
-<!-- 
+s
 <script type="text/javascript">
 	function validasi() {
 		var username = document.getElementById("username").value;

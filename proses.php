@@ -323,6 +323,51 @@ else{
         }
        
     }
+
+    function dataSampling ($idKolam)
+    {
+        global $db;
+        $sql = "SELECT * FROM sampling WHERE id_Kolam =".$idKolam;        
+        $hasil = mysqli_query($db, $sql);
+        while($row = mysqli_fetch_assoc($hasil))
+        {
+            $tanggalPermintaan = $row['tanggal_sampling'];
+            $populasi =  $row['populasi'];
+            $ukuran =  $row['ukuran'];
+            $berat =  $row['berat'];
+            $tanggalSampling =  $row['tanggal_sampling'];
+            $idKolam =  $row['id_kolam'];
+        }
+        
+        // $namaMitra = 
+        // $tanggalPermintaan = 
+        // $periodePakan = 
+        // $noKolam = 
+        // $ukuranIkan = 
+        // $populasiAwal = 
+
+
+        // Tanggal Permintaan
+        // Periode Pakan
+        // Periode Pemeliharaan
+        // Kolam Ke
+        // Ukuran Ikan
+        // Populasi Awal Masuk (Ekor)
+        // Jumlah Kematian (Ekor)
+        // Populasi Ikan Hidup(Ekor)
+        // Populasi Sampling
+        // Berat Sampling
+        // Berat Rata-rata
+        // Berat Total
+        // FR (%)
+        // Pakan Per Hari (gr)
+        // Total Pakan
+        // Ukuran Pakan
+        // Tanggal Penerimaan Pakan
+    
+    }
+
+
     
 
 
