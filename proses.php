@@ -1,14 +1,13 @@
 <?php 
-
 session_start();
 error_reporting(0);
 include('includes/config.php');
 if(strlen($_SESSION['alogin'])==0)
-	{
-header('location:index.php');
+{
+    header('location:index.php');
 }
-else{
-
+else {   
+  
 	$email = $_SESSION['alogin'];
 	$sql = "SELECT * from users where email = (:email);";
 	$query = $dbh -> prepare($sql);
@@ -17,7 +16,6 @@ else{
 	$result=$query->fetch(PDO::FETCH_OBJ);
 	$cnt=1;
     $idUser = $result->id;
-
 
     function idKolam($idUser, $jenis, $status)
     {
@@ -37,7 +35,6 @@ else{
             die("gagal");
         }
     }
-
 
     function idBibit($idKolam)
     {
@@ -124,12 +121,9 @@ else{
         }    
     }
 
-
     function dataKolamLimit ($idedit,$jenis, $mulai, $halaman){
-        global $db;       
-       
+        global $db;
         $sql = "SELECT * FROM kolam WHERE  id_pemilik = ".$idedit." AND jenis='".$jenis."' Limit ".$mulai.", ".$halaman;
-       
         $hasil = mysqli_query($db, $sql);
         $dataKolam=array(); 
 
@@ -143,7 +137,7 @@ else{
             $x['tanggal_penyelesaian']=$data['tanggal_penyelesaian'];
             $x['status']=$data['status'];
             $x['bibit']=array();
-                    $sqlBibit = "SELECT * FROM bibit WHERE id_kolam=".$data['id'];
+                    $sqlBibit = "SELECT * FROM bibit WHERE id_kolam=".$data['id']." ORDER BY `id` DESC";
                     $hasilBibit = mysqli_query($db, $sqlBibit);
 
                     while ($dataBibit=mysqli_fetch_assoc($hasilBibit)) {   
@@ -156,7 +150,7 @@ else{
                         array_push($x['bibit'], $y);}
                         
             $x['sampling']=array();
-                    $sqlSampling = "SELECT * FROM sampling WHERE id_kolam=".$data['id'];
+                    $sqlSampling = "SELECT * FROM sampling WHERE id_kolam=".$data['id']." ORDER BY `id` DESC";
                     $hasilSampling = mysqli_query($db, $sqlSampling);
 
                     while ($dataSampling=mysqli_fetch_assoc($hasilSampling)) {   
@@ -184,7 +178,7 @@ else{
                         $y['id_kolam']=$dataMonitor['id_kolam'];
                         array_push($x['monitor'], $y);}                    
             $x['panen']=array();
-                    $sqlPanen = "SELECT * FROM panen WHERE id_kolam=".$data['id'];
+                    $sqlPanen = "SELECT * FROM panen WHERE id_kolam=".$data['id']." ORDER BY `id` DESC";
                     $hasilPanen = mysqli_query($db, $sqlPanen);
 
                     while ($dataPanen=mysqli_fetch_assoc($hasilPanen)) {   
@@ -219,7 +213,7 @@ else{
                 $x['tanggal_penyelesaian']=$data['tanggal_penyelesaian'];
                 $x['status']=$data['status'];
                 $x['bibit']=array();
-                        $sqlBibit = "SELECT * FROM bibit WHERE id_kolam=".$data['id'];
+                        $sqlBibit = "SELECT * FROM bibit WHERE id_kolam=".$data['id']." ORDER BY `id` DESC";
                         $hasilBibit = mysqli_query($db, $sqlBibit);
     
                         while ($dataBibit=mysqli_fetch_assoc($hasilBibit)) {   
@@ -229,10 +223,11 @@ else{
                             $y['populasi']=$dataBibit['populasi'];
                             $y['tanggal_masuk']=$dataBibit['tanggal_masuk'];
                             $y['id_kolam']=$dataBibit['id_kolam'];
+                            $y['periode']=$dataBibit['periode'];
                             array_push($x['bibit'], $y);}
                             
                 $x['sampling']=array();
-                        $sqlSampling = "SELECT * FROM sampling WHERE id_kolam=".$data['id'];
+                        $sqlSampling = "SELECT * FROM sampling WHERE id_kolam=".$data['id']." ORDER BY `id` DESC";
                         $hasilSampling = mysqli_query($db, $sqlSampling);
     
                         while ($dataSampling=mysqli_fetch_assoc($hasilSampling)) {   
@@ -260,7 +255,7 @@ else{
                             $y['id_kolam']=$dataMonitor['id_kolam'];
                             array_push($x['monitor'], $y);}                    
                 $x['panen']=array();
-                        $sqlPanen = "SELECT * FROM panen WHERE id_kolam=".$data['id'];
+                        $sqlPanen = "SELECT * FROM panen WHERE id_kolam=".$data['id']." ORDER BY `id` DESC";
                         $hasilPanen = mysqli_query($db, $sqlPanen);
     
                         while ($dataPanen=mysqli_fetch_assoc($hasilPanen)) {   
@@ -269,6 +264,7 @@ else{
                             $y['populasi']=$dataPanen['ph_air'];
                             $y['tanggal_panen']=$dataPanen['kematian'];
                             $y['id_kolam']=$dataPanen['id_kolam'];
+                            $y['periode']=$dataPanen['periode'];
                             array_push($x['panen'], $y);}
                             
                     // untuk menambah array setelah array yang terakhir
@@ -367,9 +363,30 @@ else{
     
     }
 
-
+function tgl_indo($tanggal){
+	$bulan = array (
+		1 =>   'Januari',
+		'Februari',
+		'Maret',
+		'April',
+		'Mei',
+		'Juni',
+		'Juli',
+		'Agustus',
+		'September',
+		'Oktober',
+		'November',
+		'Desember'
+	);
+	$pecahkan = explode('-', $tanggal);
+	
+	// variabel pecahkan 0 = tanggal
+	// variabel pecahkan 1 = bulan
+	// variabel pecahkan 2 = tahun
+ 
+    return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];   
+    }
     
-
 
     
 

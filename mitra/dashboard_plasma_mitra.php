@@ -45,8 +45,7 @@ for ($i=0; $i < count($dataKolam); $i++)
                         </form>									
                     </div>				
                 </div>
-                <a class="btn btn-success mb-1 ml-1" href="hapus.php?id=<?php echo $dataKolam[$i]['id']; ?>" onclick="return  confirm('Anda yakin menghapus kolam Y/N')">Hapus Kolam </a>
-
+                
                 <?php 
 
                 if(!($dataKolam[$i]['tanggal_penyelesaian'] == "0000-00-00"))
@@ -57,7 +56,7 @@ for ($i=0; $i < count($dataKolam); $i++)
                 } ?>
                 
             <div class="collapse" id="collapseExamplemPlasma<?php echo $i; ?>">	
-            <h4 class="ml-2" ><a href="kolam.php?halaman=<?php echo $i; ?>" class="text-white underline">Detail Kolam<i class="ml-2 fas fa-angle-double-right"></i></a></h4>
+            <h4 class="ml-2" ><a href="kolam-mitra.php?halaman=<?php echo $i; ?>" class="text-white underline">Detail Kolam<i class="ml-2 fas fa-angle-double-right"></i></a></h4>
             <?php 
                     $sql = "SELECT periode FROM panen WHERE id_Kolam =". $dataKolam[$i]['id']." ORDER BY id DESC LIMIT 1"; 
                     $hasilpanen = mysqli_query($db, $sql);   
@@ -108,9 +107,7 @@ Jumlah Ikan Hidup    :<?=  $populasi - $jumlahKematian; ?> ekor
                             $periodeSampling = 2;
                         } else {  $periodeSampling = 0; }                        
 
-                    }    
-                    
-            include('input.php');?>
+                    }    ?>
                                             
                     <div class="p-3 text-left bg-info"><?php 
                     $dataMonitor = count($dataKolam[$i]['monitor']);

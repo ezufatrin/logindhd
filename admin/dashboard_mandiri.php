@@ -1,12 +1,14 @@
 <?php
 
-$dataKolam = dataKolamLimit($idedit,"Mandiri", $mulai, $halaman);
-$NoPlasma = $mulai;
+
+$NoMandiri = $mulaiMandiri;
+
+$dataKolam = dataKolamLimit($idedit,"Mandiri", $mulaiMandiri, $halamanMandiri); 
+
 //Tampilan Dashboard Kolam Mandiri
 for ($i=0; $i < count($dataKolam); $i++) 
 { 
-    if($dataKolam[$i]['jenis']=="Mandiri")
-    { $NoMandiri++; ?>				
+        $NoMandiri++; ?>				
         <div class="col-lg-6 col-12 h-75">	
             <div class="small-box bg-success "> <!-- small box -->
                 <div class="inner">										
@@ -40,7 +42,7 @@ for ($i=0; $i < count($dataKolam); $i++)
                             <input type="date" name="tanggalpemasangan" class="form-control">    
                             <label class="mt-2">Tanggal Penyelesaian</label>
                             <input type="date" name="tanggalpenyelesaian" class="form-control" ><?php } ?>                                                
-                            <input class="mt-3  pt-2 pb-2 btn bg-black" type="submit" value="Simpan" name="pasangkolam">
+                            <input class="mt-3  pt-2 pb-2 btn bg-info" type="submit" value="Simpan" name="pasangkolam">
                         </form>									
                     </div>				
                 </div>
@@ -56,40 +58,63 @@ for ($i=0; $i < count($dataKolam); $i++)
             <div class="collapse" id="collapseExamplem<?php echo $i; ?>">
 
             <?php 
-            $sql = "SELECT * FROM bibit WHERE id_Kolam =". $dataKolam[$i]['id']." ORDER BY id DESC LIMIT 1";     
- 
-            $hasil = mysqli_query($db, $sql); 
-            if(mysqli_fetch_row($hasil))
-            {
-                while($row = mysqli_fetch_assoc($hasil))
-                {
-                    $periode = $row['periode_pemeliharaan'];
-                    $populasi =  $row['populasi'];
-                    $ukuran =  $row['ukuran'];
-                    $berat =  $row['berat'];
-                    $tanggalMasuk =  $row['tanggal_masuk'];
-                    $awal = $row['tanggal_masuk'];
-                    $idKolam =  $row['id_kolam'];  
+                    $sql = "SELECT periode FROM panen WHERE id_Kolam =". $dataKolam[$i]['id']." ORDER BY id DESC LIMIT 1"; 
+                    $hasilpanen = mysqli_query($db, $sql);   
+                    $periodePanen =mysqli_fetch_assoc($hasilpanen)['periode'];
+                    
+                    $sql = "SELECT * FROM bibit WHERE id_Kolam =". $dataKolam[$i]['id']." ORDER BY id DESC LIMIT 1";  
+                    $hasilbibit = mysqli_query($db, $sql); 
+                    $rowBibit = mysqli_fetch_assoc($hasilbibit);
+                    $periode = $rowBibit['periode'];
+                    $periode = $periode==NULL? 0 : $periode;
+
+                    $sql = "SELECT SUM(kematian) as jumlahKematian FROM monitor WHERE id_Kolam =". $dataKolam[$i]['id']." AND periode = ".$periode."";  
+                    $hasil = mysqli_query($db, $sql);    
+                    $jumlahKematian =mysqli_fetch_assoc($hasil)['jumlahKematian'];
+                    $jumlahKematian = $jumlahKematian==NULL? 0 : $jumlahKematian;
+                              
+                    if($periode==0 || $periode==NULL){
+                        $masaPemeliharaan = 0;
+                        echo " <p class='mt-3 mb-3 bg-danger'>";
+                        echo " **BIBIT BELUM DIMASUKKAN KE DALAM KOLAM";
+                        echo "</p>";
+                    }
+                    else if($periodePanen==$periode){
+                        $masaPemeliharaan = 0;
+                        echo " <p class='mt-3 mb-3 bg-danger'>";
+                        echo "**SUDAH PANEN PERIODE ".$periodePanen.", NUNGGU MASUK BIBIT PERIODE ".($periode+1);
+                        echo "</p>";                           
+
+                    } else if($periodePanen<$periode){ 
+                        $masaPemeliharaan = 1;
                     ?>    
+                        
+<pre style="font-size: 18px; color:white">
+Periode Pemeliharaan :<?=  $periode;?> 
+Jumlah Bibit         :<?=  $populasi= $rowBibit['populasi']; ?> ekor 
+Ukuran Bibit         :<?=  $rowBibit['ukuran']; ?> cm
+Berat Bibit          :<?= $rowBibit['berat']/1000; ?> kg
+Tanggal Masuk Bibit  :<?=  $tanggalMasukBibit=tgl_indo($rowBibit['tanggal_masuk']); ?> 
+Jumlah Kematian      :<?= $jumlahKematian; ?> ekor
+Jumlah Ikan Hidup    :<?=  $populasi - $jumlahKematian; ?> ekor
+</pre>
+<?php     
 
-                    <h5 class="ml-2 mt-3">Periode Pemeliharaan: <?= $periode; ?> <br></h5>
-                    <h5 class="ml-2">Jumlah Bibit: <?= $populasi; ?> ekor<br></h5> 
-                    <h5 class="ml-2">Ukuran Bibit: <?= $ukuran; ?> cm<br></h5>      
-                    <h5 class="ml-2">Berat Bibit: <?= $berat; ?> kg<br></h5> 
-                    <h5 class="ml-2">Tanggal Masuk Bibit: <?= tgl_indo($tanggalMasuk); ?> <br></h5>
-         <?php  }
+                         $diff  = date_diff($tanggalMasuk, date_create());
+                        if($diff->d >20){
+                            $periodeSampling = 3;
+                        } else if($diff->d =10){
+                            $periodeSampling = 2;
+                        } else {  $periodeSampling = 0; }                        
 
-            } else {
-                echo " <p class='mt-3 ml-2 mb-3 bg-danger'>";
-                echo " **BIBIT BELUM DIMASUKKAN KE DALAM KOLAM";
-                echo "</p>";
-            }    
+                    }       
+        
 
             include('input.php');?>
 
             
                                             
-            <div class="p-3 text-left bg-info"><?php 
+            <div class="p-3 text-left bg-success"><?php 
                     $dataMonitor = count($dataKolam[$i]['monitor']);
                     if($dataMonitor>=10)
                     {
@@ -155,6 +180,6 @@ for ($i=0; $i < count($dataKolam); $i++)
                     </div>                                                    
                 </div>                                                        
             </div>				
-        </div><?php                                             
-    }
+        </div><?php                                            
+
 }

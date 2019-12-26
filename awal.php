@@ -31,7 +31,6 @@ while($row = mysqli_fetch_assoc($hasil))
     else {$Gender="";}
     $statusAdmin = $row['status'];             
 }    
-    
 
 $sql = "SELECT * FROM users Where id=".$idMitra;	
 $hasil = mysqli_query($db, $sql);
@@ -56,7 +55,6 @@ while($row = mysqli_fetch_assoc($hasil))
     $_SESSION['gender'] = $row['gender'];
     $_SESSION['status'] = $row['status'];      
 }  
-
 
 if(isset ($_POST['pilihmitra']))
 {	    
@@ -85,7 +83,8 @@ if(isset ($_POST['pilihmitra']))
             unset($_SESSION['mobile'] );
             unset($_SESSION['gender'] );
             unset($_SESSION['status']);                  
-        }        
+		} 
+		header('location:admin.php');     
     } 
     else 
     {  
@@ -349,6 +348,8 @@ if(isset($_POST['submit']))
 if(isset($_POST['monitorharian']))
 {	
 
+
+
 	// var_dump($_POST); die();
 	$monitorPHAir = $_POST['phair'];
 	$monitorSuhuAir = $_POST['suhuair'];
@@ -358,10 +359,12 @@ if(isset($_POST['monitorharian']))
 	$monitorKondisiIkan = $_POST['kondisiikan'];
 	$monitorTanggal = $_POST['tanggalpengukuran'];
 	$monitorIdKolam = $_POST['idkolam'];
+	$periode = $_POST['periode'];
+	
 
-	$sql = "INSERT INTO monitor (suhu_air, ph_air, kematian, berat_pakan, kondisi_air, kondisi_ikan, tanggal, id_kolam) VALUES("
-	.$monitorSuhuAir.",".$monitorPHAir.",".$monitorKematian.",".$monitorBeratPakan.",'".$monitorKondisiAir."','".$monitorKondisiIkan."','".$monitorTanggal."',".$monitorIdKolam.")";
-	// die($sql);
+	$sql = "INSERT INTO monitor (suhu_air, ph_air, kematian, berat_pakan, kondisi_air, kondisi_ikan, tanggal, id_kolam, periode) VALUES("
+	.$monitorSuhuAir.",".$monitorPHAir.",".$monitorKematian.",".$monitorBeratPakan.",'".$monitorKondisiAir."','".$monitorKondisiIkan."','".$monitorTanggal."',".$monitorIdKolam.",".$periode.")";
+
 	if(mysqli_query($db, $sql)){
 		$pesan = 1;		
 	} else {$pesan = 2;}	
@@ -476,10 +479,11 @@ if(isset($_POST['bibitmasuk']))
 	$periode = $_POST ['periode'];
 	$IdKolam = $_POST['idkolam'];
 
-	$sql = "INSERT INTO bibit (berat, ukuran, populasi, tanggal_masuk, periode_pemeliharaan, id_kolam) VALUES("
-	.$beratTotalBibit.",".$ukuranBibit.",".$populasiBibit.",'".$tanggalBibitMasuk."',".$periode.",".$IdKolam.")";
+	$sql = "INSERT INTO bibit (berat, ukuran, populasi, tanggal_masuk, periode, id_kolam) VALUES("
+	.$beratTotalBibit.",'".$ukuranBibit."',".$populasiBibit.",'".$tanggalBibitMasuk."',".$periode.",".$IdKolam.")";
 	 if(mysqli_query($db, $sql)){
-		 $$pesan = 1;
+		 $pesan = 1;
+		//  header('location:admin.php');
 	 } else {$pesan = 2;}
 
 	 
@@ -490,11 +494,12 @@ if(isset($_POST['pakanmasuk']))
 	$beratPakan = $_POST['beratpakan'];
 	$jenisPakan = $_POST['jenispakan'];
 	$tanggalPakanMasuk = $_POST['tanggalmasuk'];
-	$periodePakan = $_POST['periode'];
+	$periode = $_POST['periode'];
+	$periodePakan = $_POST['periodepakan'];
 	$IdKolam = $_POST['idkolam'];
 
-	$sql = "INSERT INTO pakan (jenis, berat, tanggal_masuk, id_kolam) VALUES("
-	.$jenisPakan.",".$beratPakan.",'".$tanggalPakanMasuk."',".$IdKolam.")";
+	$sql = "INSERT INTO pakan (jenis, berat, tanggal_masuk, id_kolam, periode_pakan, periode) VALUES("
+	.$jenisPakan.",".$beratPakan.",'".$tanggalPakanMasuk."',".$IdKolam.",".$periodePakan.",".$periode.")";
 	// die($sql);
 	if(mysqli_query($db, $sql)){
 		$pesan = 1;
@@ -508,33 +513,100 @@ if(isset($_POST['panen']))
 	$jumlahIkanPanen = $_POST['populasi'];
 	$tanggalPanen = $_POST['tanggalpanen'];
 	$IdKolam = $_POST['idkolam'];
+	$periode = $_POST['periode'];
 
-	$sql = "INSERT INTO panen (berat, populasi, tanggal_panen, id_kolam) VALUES("
-	.$beratPanen.",".$jumlahIkanPanen.",'".$tanggalPanen."',".$IdKolam.")";
-	// die($sql);
-	if(mysqli_query($db, $sql)){
-		$pesan = 1;
-	} else {$pesan = 2;}
+	$sql = "SELECT * FROM panen WHERE id_Kolam=".$IdKolam." AND tanggal_panen= '".$tanggalPanen."' AND periode= ".$periode;
+	$hasil = mysqli_query($db, $sql);
+	if(mysqli_num_rows($hasil)>0)
+	{
+		header('location:admin.php');
+
+	} else {
+		$sql = "INSERT INTO panen (berat, populasi, tanggal_panen, id_kolam, periode) VALUES("
+		.$beratPanen.",".$jumlahIkanPanen.",'".$tanggalPanen."',".$IdKolam.",".$periode.")";
+		// die($sql);
+		if(mysqli_query($db, $sql)){
+			$pesan = 1;
+		} else {$pesan = 2;}
+	}
+
+	
 	
 }
 
 if(isset($_POST['sampling']))
 {
+
+	$file = $_FILES['image']['name'];	
+	$tipe_file = $_FILES['image']['type'];
+	$filesize = $_FILES['image']['size'];
+	$folder="images/";	
+	$tmp_file = $_FILES['image']['tmp_name'];
 	
+		if($tipe_file == "image/jpeg" || $tipe_file == "image/png")
+		{				
+			//size image yang diinginkan
+			$width_size = 400;     
+
+			// tentukan di mana image akan ditempatkan setelah diupload
+			$filesave = $folder . $file;
+			move_uploaded_file($_FILES['image']['tmp_name'], $filesave);
+
+			// menentukan nama image setelah dibuat
+			$namabaru = uniqid(rand()) .".jpg";
+			$resize_image = $folder.$namabaru ;	
+			
+			// mendapatkan ukuran width dan height dari image
+			list( $width, $height ) = getimagesize($filesave);
+			 
+			// mendapatkan nilai pembagi supaya ukuran skala image yang dihasilkan sesuai dengan aslinya
+			$k = $width / $width_size;
+			 
+			// menentukan width yang baru
+			$newwidth = $width / $k;
+			 
+			// menentukan height yang baru
+			$newheight = $height / $k;
+			 
+			// fungsi untuk membuat image yang baru
+			$thumb = imagecreatetruecolor($newwidth, $newheight);
+			if($tipe_file == "image/jpeg"){
+				$source = imagecreatefromjpeg($filesave);
+			}else if($tipe_file == "image/png"){
+				$source = imagecreatefrompng($filesave);
+			}
+			if(imagecopyresized($thumb, $source, 0, 0, 0, 0, $newwidth, $newheight, $width, $height))
+			{		
+				if($tipe_file == "image/jpeg"){
+					imagejpeg($thumb, $resize_image);
+				}else if($tipe_file == "image/png"){
+					imagepng($thumb, $resize_image);
+				}							
+				imagedestroy($thumb);
+				imagedestroy($source);				
+				unlink($filesave); //menghapus foto asli yg baru
+			} else {
+				die("file terlalu besar");
+			}	
+		} else {
+			$message = "Hanya file Gambar yang diizinkan (jpeg/png)";
+			echo "<script>alert('$message');</script>";
+		}
+
+
 	$populasiSampling = $_POST['populasisampling'];
 	$ukuranSampling = $_POST['ukuransampling'];
 	$beratSampling = $_POST['beratsampling'];
-	
+	$periodeSampling = $_POST['periodesampling'];
 	$tanggalSampling = $_POST['tanggalsampling'];
+	$periode = $_POST['periodesampling'];
 	$IdKolam = $_POST['idkolam'];
-
-	$sql = "INSERT INTO sampling (populasi, ukuran, berat, tanggal_sampling, id_kolam) VALUES("
-	.$populasiSampling.",".$ukuranSampling.",".$beratSampling.",'".$tanggalSampling."',".$IdKolam.")";
-	// die($sql);
+	$sql = "INSERT INTO sampling (populasi, ukuran, berat, tanggal_sampling, id_kolam, periode, periode_sampling, image) VALUES("
+	.$populasiSampling.",".$ukuranSampling.",".$beratSampling.",'".$tanggalSampling."',".$IdKolam.",".$periode.",".$periodeSampling.",'".$namabaru."')";
 	if(mysqli_query($db, $sql)){
 		$pesan = 1;
 	} else {$pesan = 2;}
-    unset($_POST);
+
     
 
 }

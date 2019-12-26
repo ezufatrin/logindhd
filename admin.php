@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 error_reporting(0);
 include('includes/config.php');
@@ -143,16 +142,23 @@ $jumlahMandiriPemasangan = jumlahKolamByJensidanStatus("Mandiri","Pemasangan");
 $jumlahMandiriTerpasang = jumlahKolamByJensidanStatus("Mandiri","Terpasang");
 $jumlahMandiriTotal = $jumlahMandiriPending+$jumlahMandiriBooking+$jumlahMandiriPemasangan+$jumlahMandiriTerpasang;
 
-$jumlahKolam = $jumlahPlasmaTotal+$jumlahMandiriTotal;  
-$halaman    = 10;
-$pages      = ceil($jumlahKolamPlasma/$halaman);
-$page       = isset($_GET["halaman"]) ? (int)$_GET["halaman"] : 1;
-$mulai      = ($page>1) ? ($page * $halaman) - $halaman : 0;
+$jumlahKolam = $jumlahPlasmaTotal+$jumlahMandiriTotal; 
+
+$aktif       = $_GET["aktif"]==2 ? 2 : 1;
+
+$halamanPlasma    = 10;
+$pagesPlasma      = ceil($jumlahKolamPlasma/$halamanPlasma);
+$pagePlasma       = isset($_GET["halamanPlasma"]) ? (int)$_GET["halamanPlasma"] : 1;
+$mulaiPlasma      = ($pagePlasma>1) ? ($pagePlasma * $halamanPlasma) - $halamanPlasma : 0;
+
+ 
+$halamanMandiri    = 10;
+$pagesMandiri      = ceil($jumlahKolamMandiri/$halamanMandiri);
+$pageMandiri       = isset($_GET["halamanMandiri"]) ? (int)$_GET["halamanMandiri"] : 1;
+$mulaiMandiri      = ($pageMandiri>1) ? ($pageMandiri * $halamanMandiri) - $halamanMandiri : 0;
 
 $dataKolam = dataKolam($idedit);
 ?>
-
-
 
  <!-- Content Wrapper. Contains page content -->
  <div class="content-wrapper mt-0">
@@ -245,7 +251,7 @@ $dataKolam = dataKolam($idedit);
                 <p class="text-muted"><?php echo "Bank: ".$bank."<br>No Rek: ".$noRek."<br>Atas Nama: ".$anRek;?></p>
                 </span>
 
-                <a class="btn btn-info" href="https://api.whatsapp.com/send?phone=<?php echo "+62".ltrim($NoTelponUser,'0');?>&text=Assalamualaikum <?php echo $Gender;?>">Hubungi Mitra<i class="fab fa-whatsapp"></i></a>
+                <a class="btn btn-info" href="https://api.whatsapp.com/send?phone=<?php echo "+62".ltrim($NoTelponUser,'0');?>&text=Assalamualaikum <?php echo $Gender;?>">Hubungi Mitra<i class="fab fa-whatsapp ml-2"></i></a>
 
                 </div class="width-10">   
             </div>            
@@ -276,21 +282,29 @@ $dataKolam = dataKolam($idedit);
                     <ul class="nav nav-pills">
                     <?php  if($statusUser==2){ ?>
                         <li class="nav-item"><a class="nav-link active" href="#dashboard" data-toggle="tab">Dashboard</a></li>
-                    <?php }?>
-                        <li class="nav-item"><a class="nav-link " href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>
-                        <li class="nav-item"><a class="nav-link " href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
+                    <?php } else {
+                        
+                        if($jumlahPlasmaTotal >0 && $aktif==1){$tabMandiri=""; $tabPlasma="active";?>
+                        <li class="nav-item"><a class="nav-link active" href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
+                    <?php } else if($jumlahMandiriTotal >0 && $aktif==2){  $tabMandiri="active"; $tabPlasma="";?>
+                        <li class="nav-item"><a class="nav-link" href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
+                    <?php }else{ $tabMandiri=""; $tabPlasma="active";?>
+                        <li class="nav-item"><a class="nav-link active" href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
+                    <?php  }?>  
                         <li class="nav-item <?php echo $hideAdmin?> "><a class="nav-link" href="#inputdata" data-toggle="tab">Ubah Jumlah Kolam</a></li>	
+                        <?php }?>
                     </ul>
                 </div> <!-- tutup header -->     
               	<div class="card-body mb-5"> <!-- buka card-body -->	
 					<div class="tab-content mb-5">
 <!-- DASHBOARD -->
-<?php  if($statusUser==2){ ?>
+<?php  if($statusUser==2)
+    { ?>
                     <div class="active tab-pane" id="dashboard">
-                        <div class="container-fluid">   
-                            <?php for ($i=1; $i <= $pages; $i++) { ?>    
-                                <a class="btn btn-info mb-2" href="admin.php?halaman=<?php echo $i; ?>" style="text-decoration:none"><u><?php echo $i; ?></u></a>
-                            <?php } ?>										
+                        <div class="container-fluid">                           								
                             <div class="row"> 
                             <?php 
 
@@ -333,11 +347,6 @@ $dataKolam = dataKolam($idedit);
                                     </div>
                                 </div>                       
 
-
-
-                                <?php 
-
-                                 ?>   
                                                  <div class="col-lg-3 col-6">
                                                     <!-- small card -->
                                                     <div class="small-box bg-warning">
@@ -621,15 +630,14 @@ $dataKolam = dataKolam($idedit);
 
 <!-- PLASMA-->		
 
-            <div class="active tab-pane" id="dataPlasma">
+            <div class="<?php echo $tabPlasma;?> tab-pane" id="dataPlasma">
+            <?php for ($i=1; $i <= $pagesPlasma; $i++) { ?>    
+                                <a class="btn btn-info mb-2 ml-2" href="admin.php?halamanPlasma=<?php echo $i; ?>&aktif=1" style="text-decoration:none"><u><?php echo $i; ?></u></a>
+                            <?php } ?>		
                 <div class="container-fluid"> 
                     <div class="row"> 
                         <?php
-                        $NoPlasma=0;
-
-                        $dataKolam = dataKolamLimit($idedit,"Plasma", $mulai, $halaman);
-                        $NoPlasma = $mulai;
-
+                          
                         include('admin/dashboard_plasma.php');
                         ?>
                     </div>
@@ -637,16 +645,15 @@ $dataKolam = dataKolam($idedit);
             </div>
 
 <!-- MANDIRI -->		
-            <div class="tab-pane" id="dataMandiri">
+            <div class="<?php echo $tabMandiri;?> tab-pane" id="dataMandiri">
+            <?php for ($i=1; $i <= $pagesMandiri; $i++) { ?>    
+                                <a class="btn btn-success mb-2 ml-2" href="admin.php?halamanMandiri=<?php echo $i; ?>&aktif=2" style="text-decoration:none"><u><?php echo $i; ?></u></a>
+                            <?php } ?>		
                 <div class="container-fluid"> 
                     <div class="row"> 
 <?php
-                            $NoMandiri=0;
-                        
-                            $dataKolam = dataKolamLimit($idedit,"Mandiri", $mulai, $halaman);
-                            $NoPlasma = $mulai;
-
-                            include('admin/dashboard_mandiri.php');
+      
+                        include('admin/dashboard_mandiri.php');
 ?>
                     </div>
                 </div>
@@ -726,7 +733,7 @@ $dataKolam = dataKolam($idedit);
 		}, 3000);
 		});
 	</script>
-	<!-- <script src="js/jquery-1.9.0.min.js"></script> -->
+	<script src="js/jquery-1.9.0.min.js"></script> -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js" integrity="sha256-fvFKHgcKai7J/0TM9ekjyypGDFhho9uKmuHiFVfScCA=" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.min.js" integrity="sha256-+4KHeBj6I8jAKAU8xXRMXXlH+sqCvVCoK5GAFkmb+2I=" crossorigin="anonymous"></script>
 	
@@ -890,33 +897,6 @@ font-weight: bold;
 }
 
 </style>
-
-<?php 
-function tgl_indo($tanggal){
-	$bulan = array (
-		1 =>   'Januari',
-		'Februari',
-		'Maret',
-		'April',
-		'Mei',
-		'Juni',
-		'Juli',
-		'Agustus',
-		'September',
-		'Oktober',
-		'November',
-		'Desember'
-	);
-	$pecahkan = explode('-', $tanggal);
-	
-	// variabel pecahkan 0 = tanggal
-	// variabel pecahkan 1 = bulan
-	// variabel pecahkan 2 = tahun
- 
-    return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];   
-
-    
-}
 
 
  
