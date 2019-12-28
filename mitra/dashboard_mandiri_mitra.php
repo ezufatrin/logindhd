@@ -44,8 +44,7 @@ for ($i=0; $i < count($dataKolam); $i++)
                     </form>									
                 </div>				
             </div>
-            <a class="btn btn-info mb-1 ml-1" href="hapus.php?id=<?php echo $dataKolam[$i]['id']; ?>" onclick="return  confirm('Anda yakin menghapus kolam Y/N')">Hapus Kolam </a>
-
+       
             <?php 
 
             if(!($dataKolam[$i]['tanggal_penyelesaian'] == "0000-00-00"))
@@ -54,8 +53,8 @@ for ($i=0; $i < count($dataKolam); $i++)
             } ?>
             
         <div class="collapse" id="collapseExamplem<?php echo $i; ?>">
-        <h4 class="ml-2" ><a href="kolam-mitra.php?halaman=<?php echo $i; ?>" class="text-white underline">Detail Kolam<i class="ml-2 fas fa-angle-double-right"></i></a></h4>
-        <?php 
+        <h4 class="ml-2" ><a href="kolam-mitra.php?no=<?php echo $i; ?>&idk=<?php echo $dataKolam[$i]['id']; ?>&idu=<?php echo $idedit; ?>" class="text-white underline">Detail Kolam<i class="ml-2 fas fa-angle-double-right"></i></a></h4>
+            <?php 
                  $sql = "SELECT periode FROM panen WHERE id_Kolam =". $dataKolam[$i]['id']." ORDER BY id DESC LIMIT 1"; 
                  $hasilpanen = mysqli_query($db, $sql);   
                  $periodePanen =mysqli_fetch_assoc($hasilpanen)['periode'];
@@ -83,7 +82,8 @@ for ($i=0; $i < count($dataKolam); $i++)
                      echo "**SUDAH PANEN PERIODE ".$periodePanen.", NUNGGU MASUK BIBIT PERIODE ".($periode+1);
                      echo "</p>";                           
 
-                 } else if($periodePanen<$periode){ 
+                 } else if($periodePanen<$periode)
+                 { 
                      $masaPemeliharaan = 1;
                  ?>    
                      
@@ -98,81 +98,64 @@ Jumlah Ikan Hidup    :<?=  $populasi - $jumlahKematian; ?> ekor
 </pre>
 <?php     
 
-                      $diff  = date_diff($tanggalMasuk, date_create());
-                     if($diff->d >20){
-                         $periodeSampling = 3;
-                     } else if($diff->d =10){
-                         $periodeSampling = 2;
-                     } else {  $periodeSampling = 0; }                        
+                    $tanggalMasuk =$rowBibit['tanggal_masuk'];
+                    $diff  = date_diff(date_create($tanggalMasuk), date_create());                                                
+                    if($diff->d > 15){
+                    $periodeSampling = 3;
+                    } else if($diff->d > 5){
+                    $periodeSampling = 2;
+                    } else {  $periodeSampling = 1; }    
 
-                 }    
-            include('input.php');?>
+                }
 
-                                            
-            <div class="p-3 text-left bg-success"><?php 
-                    $dataMonitor = count($dataKolam[$i]['monitor']);
-                    if($dataMonitor>=10)
-                    {
-                        $batas =10;
-                    } else if($dataMonitor==10)
-                    {
-                        $batas = 0;              
-                    } else{
-                        $batas = $dataMonitor;
-                    }
+                    include('input.php');                                        
+                    
+                    $sqlMonitor = "SELECT * FROM monitor WHERE id_kolam=".$dataKolam[$i]['id']." AND periode = ".$periode." ORDER BY `id` DESC";
+                    $hasil = mysqli_query($db, $sqlMonitor);
 
-                        for ($g=0; $g < $batas; $g++) 
-                        {  
+                    while ($row=mysqli_fetch_assoc($hasil)) { 
+                        $tanggal[] = $row['tanggal'];
+                        $kematian[]  = $row['kematian'];
+                        $phAir[]  = $row['ph_air'];
+                        $suhuAir[]  =$row['suhu_air'];
+                        $kondisiAir[]  = $row['kondisi_air'];
+                        $kondisiIkan[]  = $row['kondisi_ikan'];
+                    } ?>
+
+                    <div class="p-3 text-left bg-success">               
+                    
+                    <?php 
+                  
+                  $dataMonitor = count($tanggal);
+                  if($dataMonitor>=10)
+                  {
+                      $batas =10;
+                  } else if($dataMonitor==10)
+                  {
+                      $batas = 0;              
+                  } else{
+                      $batas = $dataMonitor;
+                  }
+
+
+                    if ( $masaPemeliharaan==1) {
                             
-                            $tanggal = $dataKolam[$i]['monitor'][$g]['tanggal'];                                 
-                            $kematian = $dataKolam[$i]['monitor'][$g]['kematian'];
-                            $totalKematian = $totalKematian+$dataKolam[$i]['monitor'][$g]['kematian'];
-                            $jumlahIkan =  $dataKolam[$i]['bibit'][0]['populasi']-$totalKematian;   
-                            $phAir = $dataKolam[$i]['monitor'][$g]['ph_air'];
-                            $suhuAir = $dataKolam[$i]['monitor'][$g]['suhu_air'];
-                            $kondisiAir = $dataKolam[$i]['monitor'][$g]['kondisi_air'] ;
-                            $kondisiIkan = $dataKolam[$i]['monitor'][$g]['kondisi_ikan'] 
-                                ?>    
-                            <div class="border-bottom border-white text-center mt-2 mb-2">
-                                <h4 class="text-light font-weight-bold"><?php echo tgl_indo($tanggal) ; ?></h4>	
-                            </div>
-                            <table class="h5" style="width:100%">
-                                <tr class="mb-1">
-                                    <th>Parameter</th>
-                                    <th>Keterangan</th>
-                                </tr>
-                                <tr>
-                                    <td>Jumlah Ikan</td>	
-                                    <td><?php echo  $jumlahIkan;?> </td>
-                                </tr>
-                                <tr>
-                                    <td>Kebutuhan Pakan</td>	
-                                    <td>1 kg</td>
-                                </tr>
-                                <tr>
-                                    <td>Kematian</td>	
-                                    <td><?php echo  $kematian;?> </td>
-                                </tr>
-                                <tr>
-                                    <td>PH Air</td>	
-                                    <td><?php echo  $phAir;?> </td>
-
-                                </tr>
-                                <tr>
-                                    <td>Suhu Air</td>	
-                                    <td><?php echo  $suhuAir;?> </td>
-                                </tr>
-                                <tr>
-                                    <td>Kondisi Air</td>	
-                                    <td><?php echo  $kondisiAir;?> </td>
-                                </tr>
-                                <tr>
-                                    <td>Kondisi Ikan</td>	
-                                    <td><?php echo  $kondisiIkan;?> </td>
-                                </tr>
-                            </table><?php  
-                        } $totalKematian=0; ?>
-                    </div>                                                    
+                    for ($g=0; $g < $batas; $g++) 
+                    { ?> 
+                                  
+                                  <h5 class="ml-2"><?php echo tgl_indo($tanggal[$g]) ; ?></h5>                              
+<pre style="font-size: 18px; color:white">
+Kematian     :   <?php echo  $kematian[$g];?> 
+PH Air       :   <?php echo  $phAir[$g];?> 
+Suhu Air     :   <?php echo  $suhuAir[$g];?> 
+Kondisi Air  :   <?php echo  $kondisiAir[$g];?> 
+Kondisi Ikan :   <?php echo  $kondisiIkan[$g];?> 
+---------------------------------
+</pre>
+                      <?php  
+                        } $totalKematian=0; 
+                    }?>
+                    </div>                                                     
                 </div>                                                        
             </div>				
         </div><?php                                            

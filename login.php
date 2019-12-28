@@ -11,9 +11,9 @@ if(isset($_POST['login']))
 	// $status='1';
 	// $role = '1';
 	$email=$_POST['username'];
-	$password=md5($_POST['password']);
-	
+	$password=md5($_POST['password']);	
 		$sql ="SELECT email,password,status FROM users WHERE email=:email and password=:password";
+
 		$query= $dbh -> prepare($sql);
 		$query-> bindParam(':email', $email, PDO::PARAM_STR);
 		$query-> bindParam(':password', $password, PDO::PARAM_STR);
@@ -83,7 +83,7 @@ if(isset($_POST['login']))
 					</span>					
 
 					<div class="wrap-input100 validate-input m-b-10" data-validate="Username harus diisi">
-						<input class="input100" type="text" name="username" placeholder="Username/Email" id="username">
+						<input class="input100" type="text" name="username" placeholder="Email" id="username">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
 							<i class="fa fa-user"></i>
@@ -108,18 +108,21 @@ if(isset($_POST['login']))
 						<p  class="txt1 text-white">Don't Have an Account? <a  class="txt1 text-dark" href="register.php" >Signup</a></p>
 					</div> -->
 				</form>
-				<form action="register.php">
+				<form class="mb-3" action="register.php">
 					<div class="container-login100-form-btn p-t-10">
 							<button class="login100-form-btn" >
 								Daftar
 							</button>
 					</div>
 				</form>
+				<div class="text-center w-full p-t-25 p-b-100">
+						<p  class="txt1 text-white">Lupa password? <a  class="txt1 text-warning" href="lupa-password.php" >reset</a></p>
+					</div>
+			 
 				
 			</div>
 		</div>
 	</div>
-s
 <script type="text/javascript">
 	function validasi() {
 		var username = document.getElementById("username").value;
@@ -131,7 +134,7 @@ s
 			return false;
 		}
 	}
-</script> -->
+</script>
 
 
 	<!--===============================================================================================-->

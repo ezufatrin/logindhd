@@ -73,10 +73,7 @@ Input Data Sampling</a>
                 <input type="number" name="ukuransampling" class="form-control" placeholder = "Ukuran ikan (cm)" required >
                 
                 <label class="mt-2 text-info">Berat Total Sampling (gram)</label>
-                <input type="number" name="beratsampling" class="form-control" placeholder = "berat total sampling (gram)" required >
-                
-                <label class="mt-2 text-info">Periode Pakan</label>
-                <input type="number" name="periode_pakan" class="form-control" placeholder = "lebih dari 0" required >
+                <input type="number" name="beratsampling" class="form-control" placeholder = "berat total sampling (gram)" required >              
 
                 <label class="mt-2 text-info">Tanggal Sampling</label>
                 <input type="date" name="tanggalsampling" class="form-control">

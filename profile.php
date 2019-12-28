@@ -1,5 +1,6 @@
 <?php
 
+
 session_start();
 error_reporting(0);
 include('includes/config.php');
@@ -183,8 +184,6 @@ if(isset($_POST['submit']))
 
 if(isset($_POST['monitorharian']))
 {	
-
-
 
 	// var_dump($_POST); die();
 	$monitorPHAir = $_POST['phair'];
@@ -711,7 +710,6 @@ while ($data=mysqli_fetch_assoc($hasil)) {
             $y['id_kolam']=$dataPanen['id_kolam'];
             array_push($x['panen'], $y);}
             
- // untuk menambah array setelah array yang terakhir
  array_push($dataKolam, $x);
 }
 //  echo '<pre>' . var_export($DataKolam, true) . '</pre>';
@@ -737,13 +735,12 @@ while ($data=mysqli_fetch_assoc($hasil)) {
 	
 	$jumlahKolam = $jumlahPlasmaTotal+$jumlahMandiriTotal; 
 	
-	$aktif       = $_GET["aktif"]==2 ? 2 : 1;
+	$aktif       = $_GET["aktif"]==1 ? 1 : 2;
 	
 	$halamanPlasma    = 10;
 	$pagesPlasma      = ceil($jumlahKolamPlasma/$halamanPlasma);
 	$pagePlasma       = isset($_GET["halamanPlasma"]) ? (int)$_GET["halamanPlasma"] : 1;
-	$mulaiPlasma      = ($pagePlasma>1) ? ($pagePlasma * $halamanPlasma) - $halamanPlasma : 0;
-	
+	$mulaiPlasma      = ($pagePlasma>1) ? ($pagePlasma * $halamanPlasma) - $halamanPlasma : 0;	
 	 
 	$halamanMandiri    = 10;
 	$pagesMandiri      = ceil($jumlahKolamMandiri/$halamanMandiri);
@@ -751,7 +748,6 @@ while ($data=mysqli_fetch_assoc($hasil)) {
 	$mulaiMandiri      = ($pageMandiri>1) ? ($pageMandiri * $halamanMandiri) - $halamanMandiri : 0;
 	
 	$dataKolam = dataKolam($idedit);
-
 
 ?>
 
@@ -857,34 +853,39 @@ while ($data=mysqli_fetch_assoc($hasil)) {
             <div class="card"> <!-- buka card -->
                 <div class="card-header p-2"> <!-- buka header -->
                     <ul class="nav nav-pills"> 
-						<?php if($jumlahKolamPlasma==0){
-							$tabMandiri =  "active";
-							$hidePlasma = "d-none";
-							$hideMandiri = "active";
-						 } else if($jumlahKolamMandiri==0){
-							$tabPlasma =  "active";
-							$hideMandiri = "d-none";
-							$hidePlasma = "active";
-						  } else{
-							$tabMandiri =  "active";
-							$hideMandiri = "active";
-							$hidePlasma = ""; 
-						  }?>  
-						<li class="nav-item"><a class="nav-link <?= $hideMandiri;?>" href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
-						<li class="nav-item"><a class="nav-link <?= $hidePlasma;?>" href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>            
+					<?php  if($jumlahPlasmaTotal >0 && $aktif==1){$tabMandiri=""; $tabPlasma="active";?>
+                        <li class="nav-item"><a class="nav-link" href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
+						<li class="nav-item"><a class="nav-link active" href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>
+                    <?php } else if($jumlahMandiriTotal >0 && $aktif==2){  $tabMandiri="active"; $tabPlasma="";?>
+                        <li class="nav-item"><a class="nav-link active" href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
+						<li class="nav-item"><a class="nav-link" href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>                        
+                    <?php }else{ $tabMandiri=""; $tabPlasma="active";?>
+                        <li class="nav-item"><a class="nav-link" href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
+						<li class="nav-item"><a class="nav-link active" href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>						                       
+                    <?php } ?> 
 					</ul>
                 </div> <!-- tutup header -->     
               	<div class="card-body mb-5"> <!-- buka card-body -->	
 					<div class="tab-content mb-5">
+
 <!-- PLASMA-->		
 
-            <div class="<?php echo $tabPlasma;?> tab-pane" id="dataPlasma">
-            <?php for ($i=1; $i <= $pagesPlasma; $i++) { ?>    
-                                <a class="btn btn-info mb-2 ml-2" href="profile.php?halamanPlasma=<?php echo $i; ?>&aktif=1" style="text-decoration:none"><u><?php echo $i; ?></u></a>
-                            <?php } ?>		
+<div class="<?php echo $tabPlasma;?> tab-pane" id="dataPlasma">
+            <?php  if( $pagesPlasma>1){?>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination ml-2">
+                        
+                        <?php for ($i=1; $i <= $pagesPlasma; $i++) { ?>    
+                            <li class="page-item mr-1"><a class="page-link" href="profile.php?halamanPlasma=<?php echo $i; ?>&aktif=1"><?php echo $i; ?></a></li>
+                        <?php } ?>	
+                        
+                    </ul>
+				</nav>
+                <?php }?>
                 <div class="container-fluid"> 
                     <div class="row"> 
                         <?php
+                          
                         include('mitra/dashboard_plasma_mitra.php');
                         ?>
                     </div>
@@ -893,14 +894,24 @@ while ($data=mysqli_fetch_assoc($hasil)) {
 
 <!-- MANDIRI -->		
             <div class="<?php echo $tabMandiri;?> tab-pane" id="dataMandiri">
-            <?php for ($i=1; $i <= $pagesMandiri; $i++) { ?>    
-                                <a class="btn btn-success mb-2 ml-2" href="profile.php?halamanMandiri=<?php echo $i; ?>&aktif=2" style="text-decoration:none"><u><?php echo $i; ?></u></a>
-                            <?php } ?>		
+            <?php  if( $pagesMandiri>1){?>
+                <nav aria-label="Page navigation example">
+					<ul class="pagination ml-2">
+					
+						<?php for ($i=1; $i <= $pagesMandiri; $i++) { ?>    
+							<li class="page-item mr-1"><a class="page-link" href="profile.php?halamanMandiri=<?php echo $i; ?>&aktif=2"><?php echo $i; ?></a></li>
+						<?php } ?>	
+						
+					</ul>
+				</nav>
+            <?php }?>
+           
                 <div class="container-fluid"> 
                     <div class="row"> 
 <?php
       
-                        include('mitra/dashboard_mandiri_mitra.php');
+						include('mitra/dashboard_mandiri_mitra.php');
+						
 ?>
                     </div>
                 </div>

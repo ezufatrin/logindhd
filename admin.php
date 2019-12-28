@@ -282,8 +282,7 @@ $dataKolam = dataKolam($idedit);
                     <ul class="nav nav-pills">
                     <?php  if($statusUser==2){ ?>
                         <li class="nav-item"><a class="nav-link active" href="#dashboard" data-toggle="tab">Dashboard</a></li>
-                    <?php } else {
-                        
+                    <?php } else {                        
                         if($jumlahPlasmaTotal >0 && $aktif==1){$tabMandiri=""; $tabPlasma="active";?>
                         <li class="nav-item"><a class="nav-link active" href="#dataPlasma" data-toggle="tab">Data Plasma</a></li>
                         <li class="nav-item"><a class="nav-link" href="#dataMandiri" data-toggle="tab">Data Mandiri</a></li>
@@ -564,61 +563,7 @@ $dataKolam = dataKolam($idedit);
                                                 </div>
                             </div>
 
-                            <div class="card <?php echo $hideMitra?>">   
-                                <div class="card-body table-responsive pt-2">
-                                <!-- <table class="table table-hover"> -->
-                                <table id="example1" class="table table-bordered">
-                                    <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Tanggal Permintaan</th>
-                                        <th>Periode Pakan</th>
-                                        <th>Periode Pemeliharaan</th>
-                                        <th>Kolam Ke</th>
-                                        <th>Ukuran Ikan</th>
-                                        <th>Populasi Awal Masuk (Ekor)</th>
-                                        <th>Jumlah Kematian (Ekor)</th>
-                                        <th>Populasi Ikan Hidup(Ekor)</th>
-                                        <th>Populasi Sampling</th>
-                                        <th>Berat Sampling</th>
-                                        <th>Berat Rata-rata</th>
-                                        <th>Berat Total</th>
-                                        <th>FR (%)</th>
-                                        <th>Pakan Per Hari (gr)</th>
-                                        <th>Total Pakan</th>
-                                        <th>Ukuran Pakan</th>
-                                        <th>Tanggal Penerimaan Pakan</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        
-                                <?php            $list=0;                   
-                                for ($z=0; $z < count($dataKolam); $z++) {  $list++;?>
-                                    <tr>
-                                        <td> <?= $list; ?> </td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td>
-                                        <td>175</td> 
-                                    </tr>     
-                                <?php } ?>                               
-                                    </tbody>
-                                </table>
-                                </div>
-                            </div> 
+                         
 	                                
                             <div class="row"> 
                            
@@ -631,9 +576,17 @@ $dataKolam = dataKolam($idedit);
 <!-- PLASMA-->		
 
             <div class="<?php echo $tabPlasma;?> tab-pane" id="dataPlasma">
-            <?php for ($i=1; $i <= $pagesPlasma; $i++) { ?>    
-                                <a class="btn btn-info mb-2 ml-2" href="admin.php?halamanPlasma=<?php echo $i; ?>&aktif=1" style="text-decoration:none"><u><?php echo $i; ?></u></a>
-                            <?php } ?>		
+            <?php  if( $pagesPlasma>1){?>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination ml-2">
+                        
+                        <?php for ($i=1; $i <= $pagesPlasma; $i++) { ?>    
+                            <li class="page-item mr-1"><a class="page-link" href="admin.php?halamanPlasma=<?php echo $i; ?>&aktif=1"><?php echo $i; ?></a></li>
+                        <?php } ?>	
+                        
+                    </ul>
+				</nav>
+                <?php }?>
                 <div class="container-fluid"> 
                     <div class="row"> 
                         <?php
@@ -646,9 +599,18 @@ $dataKolam = dataKolam($idedit);
 
 <!-- MANDIRI -->		
             <div class="<?php echo $tabMandiri;?> tab-pane" id="dataMandiri">
-            <?php for ($i=1; $i <= $pagesMandiri; $i++) { ?>    
-                                <a class="btn btn-success mb-2 ml-2" href="admin.php?halamanMandiri=<?php echo $i; ?>&aktif=2" style="text-decoration:none"><u><?php echo $i; ?></u></a>
-                            <?php } ?>		
+            <?php  if( $pagesMandiri>1){?>
+                <nav aria-label="Page navigation example">
+					<ul class="pagination ml-2">
+					
+						<?php for ($i=1; $i <= $pagesMandiri; $i++) { ?>    
+							<li class="page-item mr-1"><a class="page-link" href="admin.php?halamanMandiri=<?php echo $i; ?>&aktif=2"><?php echo $i; ?></a></li>
+						<?php } ?>	
+						
+					</ul>
+				</nav>
+            <?php }?>
+           
                 <div class="container-fluid"> 
                     <div class="row"> 
 <?php

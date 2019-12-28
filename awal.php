@@ -599,7 +599,7 @@ if(isset($_POST['sampling']))
 	$beratSampling = $_POST['beratsampling'];
 	$periodeSampling = $_POST['periodesampling'];
 	$tanggalSampling = $_POST['tanggalsampling'];
-	$periode = $_POST['periodesampling'];
+	$periode = $_POST['periode'];
 	$IdKolam = $_POST['idkolam'];
 	$sql = "INSERT INTO sampling (populasi, ukuran, berat, tanggal_sampling, id_kolam, periode, periode_sampling, image) VALUES("
 	.$populasiSampling.",".$ukuranSampling.",".$beratSampling.",'".$tanggalSampling."',".$IdKolam.",".$periode.",".$periodeSampling.",'".$namabaru."')";

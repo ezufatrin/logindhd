@@ -57,7 +57,7 @@ for ($i=0; $i < count($dataKolam); $i++)
                 } ?>
                 
             <div class="collapse" id="collapseExamplemPlasma<?php echo $i; ?>">	
-            <h4 class="ml-2" ><a href="kolam.php?halaman=<?php echo $i; ?>" class="text-white underline">Detail Kolam<i class="ml-2 fas fa-angle-double-right"></i></a></h4>
+            <h4 class="ml-2" ><a href="kolam.php?no=<?php echo $i; ?>&idk=<?php echo $dataKolam[$i]['id']; ?>&idu=<?php echo $idedit; ?>" class="text-white underline">Detail Kolam<i class="ml-2 fas fa-angle-double-right"></i></a></h4>
             <?php 
                     $sql = "SELECT periode FROM panen WHERE id_Kolam =". $dataKolam[$i]['id']." ORDER BY id DESC LIMIT 1"; 
                     $hasilpanen = mysqli_query($db, $sql);   
@@ -100,20 +100,36 @@ Jumlah Kematian      :<?= $jumlahKematian; ?> ekor
 Jumlah Ikan Hidup    :<?=  $populasi - $jumlahKematian; ?> ekor
 </pre>
 <?php     
-
-                         $diff  = date_diff($tanggalMasuk, date_create());
-                        if($diff->d >20){
+                        $tanggalMasuk =$rowBibit['tanggal_masuk'];
+                         $diff  = date_diff(date_create($tanggalMasuk), date_create());                                                
+                        if($diff->d > 15){
                             $periodeSampling = 3;
-                        } else if($diff->d =10){
+                        } else if($diff->d > 5){
                             $periodeSampling = 2;
-                        } else {  $periodeSampling = 0; }                        
+                        } else {  $periodeSampling = 1; }                        
 
                     }    
                     
-            include('input.php');?>
-                                            
-                    <div class="p-3 text-left bg-info"><?php 
-                    $dataMonitor = count($dataKolam[$i]['monitor']);
+            include('input.php');   
+            
+                    $sqlMonitor = "SELECT * FROM monitor WHERE id_kolam=".$dataKolam[$i]['id']." AND periode = ".$periode." ORDER BY `id` DESC";
+                    $hasil = mysqli_query($db, $sqlMonitor);
+                    
+                    while ($row=mysqli_fetch_assoc($hasil)) { 
+                        $tanggal[] = $row['tanggal'];
+                        $kematian[]  = $row['kematian'];
+                        $phAir[]  = $row['ph_air'];
+                        $suhuAir[]  =$row['suhu_air'];
+                        $kondisiAir[]  = $row['kondisi_air'];
+                        $kondisiIkan[]  = $row['kondisi_ikan'];
+
+                    } ?>
+
+                    <div class="p-3 text-left bg-info">               
+                    
+                    <?php 
+
+                    $dataMonitor = count($tanggal);
                     if($dataMonitor>=10)
                     {
                         $batas =10;
@@ -124,32 +140,23 @@ Jumlah Ikan Hidup    :<?=  $populasi - $jumlahKematian; ?> ekor
                         $batas = $dataMonitor;
                     }
 
-                    $sqlMonitor = "SELECT * FROM monitor WHERE id_kolam=".$dataKolam[$i]['id']." AND periode = ".$periode." ORDER BY `id` DESC";
-                    $hasil = mysqli_query($db, $sqlMonitor);
 
-                    while ($row=mysqli_fetch_assoc($hasil)) { 
-                        $tanggal = $row['tanggal'];
-                        $kematian  = $row['kematian'];
-                        $phAir  = $row['ph_air'];
-                        $suhuAir  =$row['suhu_air'];
-                        $kondisiAir  = $row['kondisi_air'];
-                        $kondisiIkan  = $row['kondisi_ikan'];
-                        $totalKematian = $totalKematian+ $kematian;
-                        $jumlahIkan =  $dataKolam[$i]['bibit'][0]['populasi']-$totalKematian;  
-
-                        if ( $masaPemeliharaan==1)    {
-                            ?>    
-<h5 class="ml-2"><?php echo tgl_indo($tanggal) ; ?></h5>                              
+                    if ( $masaPemeliharaan==1) {
+                            
+                    for ($g=0; $g < $batas; $g++) 
+                    { ?> 
+                                  
+<h5 class="ml-2"><?php echo tgl_indo($tanggal[$g]) ; ?></h5>                              
 <pre style="font-size: 18px; color:white">
-Kematian     :   <?php echo  $kematian;?> 
-PH Air       :   <?php echo  $phAir;?> 
-Suhu Air     :   <?php echo  $suhuAir;?> 
-Kondisi Air  :   <?php echo  $kondisiAir;?> 
-Kondisi Ikan :   <?php echo  $kondisiIkan;?> 
+Kematian     :   <?php echo  $kematian[$g];?> 
+PH Air       :   <?php echo  $phAir[$g];?> 
+Suhu Air     :   <?php echo  $suhuAir[$g];?> 
+Kondisi Air  :   <?php echo  $kondisiAir[$g];?> 
+Kondisi Ikan :   <?php echo  $kondisiIkan[$g];?> 
 ---------------------------------
 </pre>
-                           <?php  
-                        } $totalKematian=0; 
+                      <?php  
+                        } $jumlahDataMonitor=0; 
                     }?>
                     </div> 
                                                                        
